@@ -18,16 +18,19 @@ DEFAULT_LED_CONFIG = {
 cfg_version = 1
 
 def load_led_config():
+    res = dict(DEFAULT_LED_CONFIG)
     if os.path.exists(LED_CONFIG_FILE):
         try:
             with open(LED_CONFIG_FILE, "r", encoding="utf-8") as f:
                 d = json.load(f)
-                res = dict(DEFAULT_LED_CONFIG)
-                res.update(d)
-                return res
+                if isinstance(d, dict):
+                    if "config" in d and isinstance(d["config"], dict):
+                        d.update(d.pop("config"))
+                    d.pop("status", None)
+                    res.update(d)
         except Exception:
             pass
-    return dict(DEFAULT_LED_CONFIG)
+    return res
 
 def save_led_config(cfg):
     global cfg_version
@@ -1522,10 +1525,11 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 
   function setUgEffectMode(ugMode) {
     curLedConfig.ug_mode = ugMode;
+    curLedConfig.ug_enabled = true;
     document.querySelectorAll('.mode-card.ug-card').forEach(c => c.classList.remove('active'));
     const target = document.getElementById('ugCard-' + ugMode);
     if (target) target.classList.add('active');
-    triggerLivePush();
+    triggerLivePush('drl', true);
   }
 
   function setIntroMode(inMode) {
@@ -1533,9 +1537,8 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     document.querySelectorAll('.mode-card.intro-card').forEach(c => c.classList.remove('active'));
     const target = document.getElementById('introCard-' + inMode);
     if (target) target.classList.add('active');
-    simIntroPlaying = true;
-    simIntroStartMs = Date.now();
     triggerLivePush();
+    playStartupIntroNow();
   }
 
   let simActiveState = 'hazard'; // 'left', 'right', 'hazard', 'drl', 'off_all'
@@ -1690,7 +1693,10 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     fetch('/api/xedua/led')
       .then(r => r.json())
       .then(data => {
-        curLedConfig = Object.assign(curLedConfig, data);
+        const cfg = data.config || data;
+        curLedConfig = Object.assign(curLedConfig, cfg);
+        delete curLedConfig.config;
+        delete curLedConfig.status;
         document.getElementById('dotTarget-left').style.background  = curLedConfig.left_color;
         document.getElementById('dotTarget-right').style.background = curLedConfig.right_color;
         document.getElementById('dotTarget-drl').style.background   = curLedConfig.drl_color;
@@ -2737,9 +2743,21 @@ def api_led():
     global led_config
     if request.method == "POST":
         data = request.get_json(force=True, silent=True) or {}
+        if "config" in data and isinstance(data["config"], dict):
+            sub = data.pop("config")
+            data.update(sub)
+        data.pop("status", None)
+
+        p_act = data.get("preview_act") or data.get("action")
+        if p_act:
+            pending_commands["test_action"] = p_act
+        in_mode = data.get("intro_mode")
+        if in_mode:
+            pending_commands["test_in_mode"] = in_mode
+
         led_config.update(data)
         save_led_config(led_config)
-        return jsonify({"status": "ok", "message": "?? l?u l?n Render Cloud (Xe s? t? ??ng b?)", "config": led_config})
+        return jsonify({"status": "ok", "message": "Đã lưu lên Render Cloud (Xe sẽ tự đồng bộ)", "config": led_config})
     return jsonify({"status": "ok", "config": led_config})
 
 @xedua_bp.route("/api/xedua/led/test", methods=["POST"])
