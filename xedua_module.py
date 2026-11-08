@@ -197,7 +197,32 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
       display: grid; grid-template-columns: 420px 1fr; gap: 16px; align-items: start;
     }
     @media (max-width: 920px) {
-      .led-grid { grid-template-columns: 1fr; }
+      .led-grid { grid-template-columns: 1fr; gap: 12px; }
+      .car-sim-card {
+        position: relative !important;
+        top: 0 !important;
+        width: 100% !important;
+        max-width: 420px !important;
+        margin: 0 auto 12px auto !important;
+        padding: 12px !important;
+        z-index: 1 !important;
+      }
+      .right-col {
+        position: relative;
+        z-index: 2;
+      }
+      .mode-card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(102px, 1fr)) !important;
+        gap: 6px !important;
+      }
+      .mode-card {
+        padding: 8px 6px !important;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .mode-card .m-icon { font-size: 1.2rem; }
+      .mode-card .m-name { font-size: 0.72rem; }
+      .mode-card .m-desc { font-size: 0.6rem; }
     }
 
     /* Khung mô phỏng xe 2D 32 Bóng LED thực tế */
@@ -206,7 +231,14 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
       border: 1px solid #00e5ff66; border-radius: 16px; padding: 16px;
       display: flex; flex-direction: column; align-items: center; gap: 12px;
       box-shadow: 0 0 28px rgba(0, 229, 255, 0.14);
-      position: sticky; top: 14px;
+      position: relative;
+    }
+    @media (min-width: 921px) {
+      .car-sim-card {
+        position: sticky;
+        top: 14px;
+        z-index: 5;
+      }
     }
     .car-chassis-box {
       width: 310px; height: 450px; position: relative; margin: 4px 0;
@@ -592,10 +624,17 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     <div class="led-grid">
       <!-- Cột trái: Mô phỏng trực quan 30 bóng LED trên 6 cụm của xe -->
       <div class="car-sim-card">
-        <div class="ptitle" style="width:100%;color:#00e5ff;margin-bottom:2px;">
-          <span>🏎️ MÔ PHỎNG 6 CỤM (30 LED WS2812B)</span>
-          <span id="simStatusBadge" style="color:#3fb950;font-size:0.72rem;">30 PIXELS LIVE</span>
+        <div class="ptitle" style="width:100%;color:#00e5ff;margin-bottom:2px;display:flex;align-items:center;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span>🏎️ MÔ PHỎNG 6 CỤM XE</span>
+            <span id="simStatusBadge" style="color:#3fb950;font-size:0.72rem;">LIVE</span>
+          </div>
+          <button id="btnToggleSim" type="button" onclick="toggleSimCollapse()" class="btn btn-dark" style="min-width:auto;padding:3px 9px;font-size:0.72rem;border-color:#00e5ff88;color:#00e5ff;">
+            🔽 Thu gọn
+          </button>
         </div>
+
+        <div id="simBodyCollapsible" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:12px;">
 
         <div class="car-chassis-box">
           <!-- Ánh sáng phản chiếu gầm -->
@@ -686,6 +725,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
           </div>
         </div>
         <button class="btn btn-dark" style="width:100%;padding:9px;" onclick="setSimState('off_all')">⏹ TẮT TẤT CẢ 30 BÓNG LED</button>
+        </div> <!-- end simBodyCollapsible -->
       </div>
 
       <!-- Cột phải: Bàn xoay màu 360° + Dải quang phổ cầu vồng + 12 Hiệu ứng Xi Nhan + 16 Hiệu ứng Đèn Gầm -->
@@ -1105,6 +1145,19 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
   buildUnderglowDOM();
 
   // Chuyển Tab chính: 'race' hoặc 'led'
+  let simCollapsed = false;
+  function toggleSimCollapse() {
+    simCollapsed = !simCollapsed;
+    const body = document.getElementById('simBodyCollapsible');
+    const btn = document.getElementById('btnToggleSim');
+    if (body) {
+      body.style.display = simCollapsed ? 'none' : 'flex';
+    }
+    if (btn) {
+      btn.innerHTML = simCollapsed ? '👁️ Xem mô phỏng xe' : '🔽 Thu gọn';
+    }
+  }
+
   function switchMainTab(tab) {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
