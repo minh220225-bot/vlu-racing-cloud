@@ -2835,10 +2835,11 @@ def api_zero_imu():
 @xedua_bp.route("/api/xedua/ota_flash", methods=["POST"])
 def api_ota_flash():
     host = request.host_url.rstrip("/")
-    fw_url = f"{host}/firmware/xe_racing_s3.ino.bin"
+    data = request.get_json(force=True, silent=True) or {}
+    fw_url = data.get("url") or f"{host}/firmware/xe_racing_s3.ino.bin"
     pending_commands["ota_url"] = fw_url
     car_state["ota_msg"] = f"Đã gửi lệnh nạp Cloud OTA ({fw_url}) xuống xe!"
-    return jsonify({"status": "ok", "message": f"Đã phát lệnh nạp Cloud OTA từ Render!\nXe sẽ tự động tải firmware từ: {fw_url}"})
+    return jsonify({"status": "ok", "message": f"Đã phát lệnh nạp Cloud OTA từ Render!\nXe sẽ tự động tải firmware từ: {fw_url}", "url": fw_url})
 
 @xedua_bp.route("/api/xedua/sync", methods=["POST"])
 def api_car_sync():
