@@ -19,6 +19,7 @@ def led_shortcut():
     return redirect("/xedua/led")
 
 @app.route("/api/firmware/latest.bin")
+@app.route("/api/firmware/xe_racing_s3.ino.bin")
 @app.route("/firmware/xe_racing_s3.ino.bin")
 def serve_firmware():
     fw_path = os.path.join(BASE_DIR, "firmware", "xe_racing_s3.ino.bin")
