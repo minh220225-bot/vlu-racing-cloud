@@ -946,82 +946,82 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
           </div>
 
           <div class="mode-card-grid" id="ugCardsGrid">
-            <div class="mode-card ug-card active" id="ugCard-neon_cyber" onclick="setUgEffectMode('neon_cyber')">
+            <div class="mode-card ug-card active" id="ugCard-neon_cyber" onclick="setUgEffectMode('neon_cyber', true)">
               <div class="m-icon">🌈</div>
               <div class="m-name">1. Cầu Vồng Dọc Xe</div>
               <div class="m-desc">Trượt 7 sắc dọc 11 bóng</div>
             </div>
-            <div class="mode-card ug-card" id="ugCard-knight_rider" onclick="setUgEffectMode('knight_rider')">
+            <div class="mode-card ug-card" id="ugCard-knight_rider" onclick="setUgEffectMode('knight_rider', true)">
               <div class="m-icon">🏎️</div>
               <div class="m-name">2. Mắt Thần K.I.T.T</div>
               <div class="m-desc">Tia quét Đầu ↔ Đuôi</div>
             </div>
-            <div class="mode-card ug-card" id="ugCard-meteor_rain" onclick="setUgEffectMode('meteor_rain')">
+            <div class="mode-card ug-card" id="ugCard-meteor_rain" onclick="setUgEffectMode('meteor_rain', true)">
               <div class="m-icon">☄️</div>
               <div class="m-name">3. Mưa Sao Băng</div>
               <div class="m-desc">Sao băng trắng phóng dọc</div>
             </div>
-            <div class="mode-card ug-card" id="ugCard-dual_flow" onclick="setUgEffectMode('dual_flow')">
+            <div class="mode-card ug-card" id="ugCard-dual_flow" onclick="setUgEffectMode('dual_flow', true)">
               <div class="m-icon">🌊</div>
               <div class="m-name">4. Sóng Đôi 2 Màu</div>
               <div class="m-desc">Cuộn sóng Màu Gầm 1 & 2</div>
             </div>
-            <div class="mode-card ug-card" id="ugCard-center_burst" onclick="setUgEffectMode('center_burst')">
+            <div class="mode-card ug-card" id="ugCard-center_burst" onclick="setUgEffectMode('center_burst', true)">
               <div class="m-icon">💥</div>
               <div class="m-name">5. Bung Tỏa Từ Tâm</div>
               <div class="m-desc">Giữa gầm nổ sóng ra 2 đầu</div>
             </div>
-            <div class="mode-card ug-card" id="ugCard-converge_in" onclick="setUgEffectMode('converge_in')">
+            <div class="mode-card ug-card" id="ugCard-converge_in" onclick="setUgEffectMode('converge_in', true)">
               <div class="m-icon">🌀</div>
               <div class="m-name">6. Hội Tụ Về Tâm</div>
               <div class="m-desc">2 đầu lao vào giữa gầm</div>
             </div>
-            <div class="mode-card ug-card" id="ugCard-nitro_flame" onclick="setUgEffectMode('nitro_flame')">
+            <div class="mode-card ug-card" id="ugCard-nitro_flame" onclick="setUgEffectMode('nitro_flame', true)">
               <div class="m-icon">🔥</div>
               <div class="m-name">7. Lửa Nitro Bô Xe</div>
               <div class="m-desc">Ngọn lửa bập bùng 11 LED</div>
             </div>
-            <div class="mode-card ug-card" id="ugCard-police_pursuit" onclick="setUgEffectMode('police_pursuit')">
+            <div class="mode-card ug-card" id="ugCard-police_pursuit" onclick="setUgEffectMode('police_pursuit', true)">
               <div class="m-icon">🚓</div>
               <div class="m-name">8. Cảnh Sát Đặc Nhiệm</div>
               <div class="m-desc">Quét Đỏ-Xanh-Trắng 2 sườn</div>
             </div>
-            <div class="mode-card ug-card" id="ugCard-throttle_react" onclick="setUgEffectMode('throttle_react')">
+            <div class="mode-card ug-card" id="ugCard-throttle_react" onclick="setUgEffectMode('throttle_react', true)">
               <div class="m-icon">🚀</div>
               <div class="m-name">9. Cảm Ứng Theo Ga</div>
               <div class="m-desc">Bóp ga càng lớn chạy càng gắt</div>
             </div>
-            <div class="mode-card ug-card" id="ugCard-galaxy_twinkle" onclick="setUgEffectMode('galaxy_twinkle')">
+            <div class="mode-card ug-card" id="ugCard-galaxy_twinkle" onclick="setUgEffectMode('galaxy_twinkle', true)">
               <div class="m-icon">✨</div>
               <div class="m-name">10. Ngân Hà Lấp Lánh</div>
               <div class="m-desc">Hạt sao trắng trên nền Neon</div>
             </div>
-            <div class="mode-card ug-card" id="ugCard-breathing_sync" onclick="setUgEffectMode('breathing_sync')">
+            <div class="mode-card ug-card" id="ugCard-breathing_sync" onclick="setUgEffectMode('breathing_sync', true)">
               <div class="m-icon">💓</div>
               <div class="m-name">11. Nhịp Thở Đổi Sắc</div>
               <div class="m-desc">Thở êm giữa Màu 1 & Màu 2</div>
             </div>
-            <div class="mode-card ug-card" id="ugCard-theater_chase" onclick="setUgEffectMode('theater_chase')">
+            <div class="mode-card ug-card" id="ugCard-theater_chase" onclick="setUgEffectMode('theater_chase', true)">
               <div class="m-icon">🎪</div>
               <div class="m-name">12. Đuổi Hạt Cyber</div>
               <div class="m-desc">Chuỗi hạt 3 bóng rượt đuổi</div>
             </div>
-            <div class="mode-card ug-card" id="ugCard-strobe_matrix" onclick="setUgEffectMode('strobe_matrix')">
+            <div class="mode-card ug-card" id="ugCard-strobe_matrix" onclick="setUgEffectMode('strobe_matrix', true)">
               <div class="m-icon">⚡</div>
               <div class="m-name">13. Chớp Ma Trận Drift</div>
               <div class="m-desc">Nháy phân đoạn 4 bóng</div>
             </div>
-            <div class="mode-card ug-card" id="ugCard-ocean_aurora" onclick="setUgEffectMode('ocean_aurora')">
+            <div class="mode-card ug-card" id="ugCard-ocean_aurora" onclick="setUgEffectMode('ocean_aurora', true)">
               <div class="m-icon">🌌</div>
               <div class="m-name">14. Cực Quang Aurora</div>
               <div class="m-desc">Sóng lượn đa tầng biến ảo</div>
             </div>
-            <div class="mode-card ug-card" id="ugCard-turn_sync_ug" onclick="setUgEffectMode('turn_sync_ug')">
+            <div class="mode-card ug-card" id="ugCard-turn_sync_ug" onclick="setUgEffectMode('turn_sync_ug', true)">
               <div class="m-icon">🔗</div>
               <div class="m-name">15. Gầm Đuổi Xi Nhan</div>
               <div class="m-desc">Rẽ bên nào gầm bên đó chạy tia</div>
             </div>
-            <div class="mode-card ug-card" id="ugCard-solid_neon" onclick="setUgEffectMode('solid_neon')">
+            <div class="mode-card ug-card" id="ugCard-solid_neon" onclick="setUgEffectMode('solid_neon', true)">
               <div class="m-icon">💡</div>
               <div class="m-name">16. Đèn Ống Neon Tĩnh</div>
               <div class="m-desc">Sáng mịn Gradient Fast&Furious</div>
@@ -1419,23 +1419,47 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     if (doLivePush) {
       if (activeColorTarget === 'left' || activeColorTarget === 'right') {
         const pAct = curLedConfig.turn_always_fx ? null : (curLedConfig.sync_sides ? 'hazard' : activeColorTarget);
-        triggerLivePush(pAct);
+        triggerLivePush(pAct, true, true);
       } else {
-        triggerLivePush();
+        triggerLivePush('drl', true, true);
       }
     }
   }
 
   let pendingPreviewAct = null;
-  function triggerLivePush(previewAct = null, immediate = false) {
+  function triggerLivePush(previewAct = null, immediate = false, saveToNvs = false) {
     if (previewAct) pendingPreviewAct = previewAct;
     if (livePushTimeout) clearTimeout(livePushTimeout);
     livePushTimeout = setTimeout(() => {
-      const payload = Object.assign({}, curLedConfig, { live: true });
+      const payload = Object.assign({}, curLedConfig, { live: !saveToNvs });
       if (pendingPreviewAct) {
         payload.preview_act = pendingPreviewAct;
         pendingPreviewAct = null;
       }
+
+      // 1. TỐC ĐỘ SIÊU TỐC (~10ms): Bắn trực tiếp qua WiFi nội bộ nếu thiết bị đang cùng mạng với xe
+      if (lastData && lastData.ip && lastData.ip.startsWith('192.168.')) {
+        try {
+          const q = new URLSearchParams();
+          if (payload.preview_act) q.append('t_act', payload.preview_act);
+          if (payload.mode) q.append('t_mode', payload.mode);
+          if (payload.speed_ms) q.append('t_spd', payload.speed_ms);
+          if (payload.brightness) q.append('t_bri', payload.brightness);
+          if (payload.left_color) q.append('l_col', payload.left_color);
+          if (payload.right_color) q.append('r_col', payload.right_color);
+          if (payload.drl_color) q.append('d_col', payload.drl_color);
+          if (payload.ug_mode) q.append('u_mode', payload.ug_mode);
+          if (payload.ug_color1) q.append('u_col1', payload.ug_color1);
+          if (payload.ug_color2) q.append('u_col2', payload.ug_color2);
+          if (payload.ug_speed_ms) q.append('u_spd', payload.ug_speed_ms);
+          if (payload.ug_brightness) q.append('u_bri', payload.ug_brightness);
+          if (payload.ug_enabled !== undefined) q.append('u_en', payload.ug_enabled ? '1' : '0');
+          if (saveToNvs) q.append('save', '1');
+          fetch('http://' + lastData.ip + '/set_led?' + q.toString(), { mode: 'no-cors' }).catch(()=>{});
+        } catch(e){}
+      }
+
+      // 2. ĐỒNG BỘ LÊN RENDER CLOUD ĐỂ LƯU VÀ CÁC THIẾT BỊ KHÁC ĐỒNG BỘ
       fetch('/api/xedua/led', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -1457,7 +1481,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
       document.getElementById('btnTestHazard').classList.add('active');
       document.getElementById('btnTestDrl').classList.remove('active');
     }
-    triggerLivePush(getTurnPreviewAction(), true);
+    triggerLivePush(getTurnPreviewAction(), true, true);
   }
 
   async function toggleTurnAlwaysFx(checked) {
@@ -1492,7 +1516,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     if (val) {
       curLedConfig.right_color = curLedConfig.left_color;
       document.getElementById('dotTarget-right').style.background = curLedConfig.left_color;
-      triggerLivePush();
+      triggerLivePush(null, false, true);
     }
   }
 
@@ -1512,24 +1536,31 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         document.getElementById('btnTestDrl').classList.remove('active');
       }
       const pAct = getTurnPreviewAction();
-      triggerLivePush(pAct, true);
+      triggerLivePush(pAct, true, true);
       const logEl = document.getElementById('ledStatusLog');
       if (logEl) {
         logEl.innerText = curLedConfig.turn_always_fx
-          ? `🔥 Đang chạy liên tục hiệu ứng [${mode}] trên cả 4 cụm góc xe!`
-          : `🔶 Đang phát thử trực tiếp hiệu ứng Xi Nhan [${mode}] trên 4 cụm góc xe thật (20 giây — đánh lái tự tắt)!`;
+          ? `🔥 Đang chạy liên tục hiệu ứng [${mode}] trên cả 4 cụm góc xe & tự động lưu nhớ!`
+          : `🔶 Đang phát thử trực tiếp hiệu ứng Xi Nhan [${mode}] trên 4 cụm góc xe thật (20 giây) & tự động lưu nhớ!`;
         logEl.style.color = '#ff9900';
       }
     }
   }
 
-  function setUgEffectMode(ugMode) {
+  function setUgEffectMode(ugMode, userClicked = false) {
     curLedConfig.ug_mode = ugMode;
     curLedConfig.ug_enabled = true;
     document.querySelectorAll('.mode-card.ug-card').forEach(c => c.classList.remove('active'));
     const target = document.getElementById('ugCard-' + ugMode);
     if (target) target.classList.add('active');
-    triggerLivePush('drl', true);
+    if (userClicked) {
+      triggerLivePush('drl', true, true);
+      const logEl = document.getElementById('ledStatusLog');
+      if (logEl) {
+        logEl.innerText = `🌈 Đang kích hoạt hiệu ứng Đèn Gầm [${ugMode}] (22 LED) & tự động lưu nhớ vào xe!`;
+        logEl.style.color = '#a371f7';
+      }
+    }
   }
 
   function setIntroMode(inMode) {
@@ -1537,7 +1568,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     document.querySelectorAll('.mode-card.intro-card').forEach(c => c.classList.remove('active'));
     const target = document.getElementById('introCard-' + inMode);
     if (target) target.classList.add('active');
-    triggerLivePush();
+    triggerLivePush(null, false, true);
     playStartupIntroNow();
   }
 
@@ -2407,6 +2438,27 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     const logEl = document.getElementById('ledStatusLog');
     logEl.innerText = 'Đang lưu cấu hình 6 cụm LED và truyền xuống xe qua WiFi...';
 
+    // Bắn trực tiếp qua WiFi nội bộ nếu có local IP
+    if (lastData && lastData.ip && lastData.ip.startsWith('192.168.')) {
+      try {
+        const q = new URLSearchParams();
+        q.append('t_mode', curLedConfig.mode);
+        q.append('t_spd', curLedConfig.speed_ms);
+        q.append('t_bri', curLedConfig.brightness);
+        q.append('l_col', curLedConfig.left_color);
+        q.append('r_col', curLedConfig.right_color);
+        q.append('d_col', curLedConfig.drl_color);
+        q.append('u_mode', curLedConfig.ug_mode);
+        q.append('u_col1', curLedConfig.ug_color1);
+        q.append('u_col2', curLedConfig.ug_color2);
+        q.append('u_spd', curLedConfig.ug_speed_ms);
+        q.append('u_bri', curLedConfig.ug_brightness);
+        q.append('u_en', (curLedConfig.ug_enabled !== false) ? '1' : '0');
+        q.append('save', '1');
+        fetch('http://' + lastData.ip + '/set_led?' + q.toString(), { mode: 'no-cors' }).catch(()=>{});
+      } catch(e){}
+    }
+
     try {
       const res = await fetch('/api/xedua/led', {
         method: 'POST',
@@ -2790,13 +2842,20 @@ def api_ota_flash():
 
 @xedua_bp.route("/api/xedua/sync", methods=["POST"])
 def api_car_sync():
+    global cfg_version, led_config
     data = request.get_json(force=True, silent=True) or {}
     car_state.update(data)
     car_state["last_seen"] = time.time()
     car_state["online"] = True
 
     car_cfg_ver = data.get("cfg_ver", 0)
-    need_cfg = (car_cfg_ver != cfg_version)
+    # BẢO VỆ CẤU HÌNH XE KHI RENDER KHỞI ĐỘNG LẠI:
+    # Nếu Render vừa khởi động lại (cfg_version <= 1) mà xe đã có cấu hình trong NVS (car_cfg_ver > 1),
+    # Render không được ghi đè mặc định xuống xe, mà giữ nguyên phiên bản của xe:
+    if cfg_version <= 1 and car_cfg_ver > 1:
+        cfg_version = car_cfg_ver
+
+    need_cfg = (car_cfg_ver < cfg_version)
 
     resp = {
         "status": "ok",
@@ -2810,6 +2869,7 @@ def api_car_sync():
     }
 
     pending_commands["test_action"] = None
+    pending_commands["test_in_mode"] = None
     pending_commands["zero_imu"] = False
     pending_commands["tune_qs"] = None
     pending_commands["ota_url"] = None
