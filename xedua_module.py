@@ -12,10 +12,11 @@ DEFAULT_LED_CONFIG = {
     "drl_enabled": True, "turn_always_fx": False, "swap_turn_dir": False,
     "ug_color1": "#00E5FF", "ug_color2": "#9D00FF", "ug_mode": "neon_cyber",
     "ug_speed_ms": 240, "ug_brightness": 85, "ug_enabled": True, "ug_rev_left": False,
-    "intro_mode": "audi_rs", "intro_enabled": True
+    "intro_mode": "audi_rs", "intro_enabled": True, "master_lights": False
 }
 
 cfg_version = 1
+web_cfg_dirty = False
 
 def load_led_config():
     res = dict(DEFAULT_LED_CONFIG)
@@ -574,6 +575,16 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             <button class="btn btn-green" onclick="triggerInstantOTA()">⚡ NẠP NGAY FILE .BIN HIỆN TẠI QUA WIFI</button>
             <button class="btn btn-blue" onclick="compileAndOTA()">🔨 TỰ BIÊN DỊCH CODE MỚI & NẠP QUA WIFI</button>
           </div>
+          <!-- Công Tắc Đèn Toàn Xe (Tự tắt sau Intro / Bật-Tắt ngay tại Tab Đua Xe) -->
+          <div id="raceMasterLightBanner" style="margin:10px 0 8px;padding:10px 14px;border-radius:10px;background:#0d1b2a;border:1.5px solid #58a6ff88;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+            <div>
+              <div id="raceMasterLightTitle" style="font-size:0.82rem;font-weight:900;color:#f85149;">🚫 ĐÈN TOÀN XE: ĐANG TẮT (Tự tắt sau Intro)</div>
+              <div id="raceMasterLightSub" style="font-size:0.71rem;color:#c9d1d9;margin-top:2px;">Xe mới bật chạy xong Intro sẽ tự tắt sạch 30 LED (chỉ chớp xi nhan khi rẽ). Bấm nút bên phải để Bật/Tắt nhanh!</div>
+            </div>
+            <button id="btnRaceToggleMasterLight" class="btn" style="flex:0;min-width:245px;padding:10px 14px;background:linear-gradient(135deg,#238636,#2ea043);color:#fff;font-weight:900;box-shadow:0 0 14px rgba(46,160,67,0.35);" onclick="setMasterLightMode(!curLedConfig.master_lights)">
+              💡 BẬT ĐÈN TOÀN XE
+            </button>
+          </div>
           <!-- Nút Tắt/Mở Đèn Gầm Nhanh Cho Chế Độ Thi Đấu Ngay Tại Tab Đua Xe -->
           <div id="raceUgBanner" style="margin:10px 0 8px;padding:10px 14px;border-radius:10px;background:#241016;border:1.5px solid #f8514988;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
             <div>
@@ -828,6 +839,24 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             <div class="swatch-pill" onclick="applyPreset('#0055FF')"><div class="swatch-color" style="background:#0055FF;"></div> Xanh Bugatti</div>
             <div class="swatch-pill" onclick="applyPreset('#00FFCC')"><div class="swatch-color" style="background:#00FFCC;"></div> Ngọc Mint</div>
             <div class="swatch-pill" onclick="applyPreset('#FF00FF')"><div class="swatch-color" style="background:#FF00FF;"></div> Tím Neon</div>
+          </div>
+        </div>
+
+        <!-- 1B. CÔNG TẮC ĐÈN TOÀN XE & TỰ TẮT SAU INTRO (TIẾT KIỆM PIN & KHÔNG SÁNG HOÀI) -->
+        <div class="panel" style="border-color:#58a6ff88;background:#0d1b2a;">
+          <div class="ptitle" style="color:#58a6ff;">
+            <span>⚡ CÔNG TẮC ĐÈN TOÀN XE & TỰ TẮT SAU INTRO</span>
+            <span id="badgeMasterLight" style="font-size:0.75rem;padding:2px 8px;border-radius:6px;background:#da363322;color:#f85149;border:1px solid #da363388;">🔴 ĐANG TẮT ĐÈN</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:4px 0;">
+            <div>
+              <div style="font-size:0.92rem;font-weight:900;" id="masterLightStatusText">Tự động TẮT TOÀN BỘ ĐÈN sau khi chạy xong Intro chào mừng</div>
+              <div style="font-size:0.74rem;color:#8b949e;margin-top:2px;">Khi công tắc TẮT: Xe chạy xong Intro sẽ tắt sạch 30 bóng LED (chỉ chớp xi nhan khi đánh lái hoặc khi bấm nút đèn trên tay cầm). Bấm <b>"BẬT ĐÈN XE"</b> nếu muốn Demi & Gầm sáng liên tục!</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button id="btnMasterLightOff" class="btn active" style="background:#da3633;color:#fff;font-weight:900;" onclick="setMasterLightMode(false)">🚫 TẮT HẲN ĐÈN</button>
+              <button id="btnMasterLightOn" class="btn" style="background:#238636;color:#fff;font-weight:900;" onclick="setMasterLightMode(true)">💡 BẬT ĐÈN XE</button>
+            </div>
           </div>
         </div>
 
@@ -1203,7 +1232,8 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     ug_enabled: true,
     ug_rev_left: false,
     intro_mode: 'audi_rs',
-    intro_enabled: true
+    intro_enabled: true,
+    master_lights: false
   };
 
   let activeColorTarget = 'left'; // 'left', 'right', 'drl', 'ug1', 'ug2'
@@ -1454,6 +1484,13 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
           if (payload.ug_speed_ms) q.append('u_spd', payload.ug_speed_ms);
           if (payload.ug_brightness) q.append('u_bri', payload.ug_brightness);
           if (payload.ug_enabled !== undefined) q.append('u_en', payload.ug_enabled ? '1' : '0');
+          if (payload.ug_rev_left !== undefined) q.append('u_rev', payload.ug_rev_left ? '1' : '0');
+          if (payload.drl_enabled !== undefined) q.append('d_en', payload.drl_enabled ? '1' : '0');
+          if (payload.turn_always_fx !== undefined) q.append('t_alw', payload.turn_always_fx ? '1' : '0');
+          if (payload.swap_turn_dir !== undefined) q.append('t_swap', payload.swap_turn_dir ? '1' : '0');
+          if (payload.intro_mode) q.append('in_mode', payload.intro_mode);
+          if (payload.intro_enabled !== undefined) q.append('in_en', payload.intro_enabled ? '1' : '0');
+          if (payload.master_lights !== undefined) q.append('m_light', payload.master_lights ? '1' : '0');
           if (saveToNvs) q.append('save', '1');
           fetch('http://' + lastData.ip + '/set_led?' + q.toString(), { mode: 'no-cors' }).catch(()=>{});
         } catch(e){}
@@ -1570,6 +1607,81 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     if (target) target.classList.add('active');
     triggerLivePush(null, false, true);
     playStartupIntroNow();
+  }
+
+  async function setMasterLightMode(enable) {
+    curLedConfig.master_lights = !!enable;
+    updateMasterLightUI(curLedConfig.master_lights);
+
+    simIntroPlaying = false;
+    simActiveState = enable ? 'drl' : 'off_all';
+    document.getElementById('btnTestLeft').classList.remove('active');
+    document.getElementById('btnTestRight').classList.remove('active');
+    document.getElementById('btnTestHazard').classList.remove('active');
+    document.getElementById('btnTestDrl').classList.toggle('active', !!enable);
+
+    const logEl = document.getElementById('ledStatusLog');
+    const msg = enable
+      ? '💡 ĐÃ BẬT ĐÈN TOÀN XE: Đèn Demi & Đèn Gầm sẽ sáng liên tục sau Intro!'
+      : '🚫 ĐÃ TẮT ĐÈN TOÀN XE: Xe chạy xong Intro sẽ TỰ TẮT HẲN 30 LED (Chỉ chớp xi nhan khi rẽ / bật nút trên tay cầm)!';
+    if (logEl) {
+      logEl.innerText = msg;
+      logEl.style.color = enable ? '#3fb950' : '#f85149';
+    }
+
+    // Gửi t_act='off' để hủy chế độ test tạm 20s -> trả thẳng quyền cho g_masterLight (không khóa xi nhan!)
+    triggerLivePush('off', true, true);
+  }
+
+  function updateMasterLightUI(enabled) {
+    const btnOn  = document.getElementById('btnMasterLightOn');
+    const btnOff = document.getElementById('btnMasterLightOff');
+    const badge  = document.getElementById('badgeMasterLight');
+    const txt    = document.getElementById('masterLightStatusText');
+
+    // Tab 1 Quick Banner
+    const raceTitle = document.getElementById('raceMasterLightTitle');
+    const raceBtn   = document.getElementById('btnRaceToggleMasterLight');
+
+    if (enabled) {
+      if (btnOn)  btnOn.className  = 'btn active';
+      if (btnOff) btnOff.className = 'btn';
+      if (badge) {
+        badge.innerText = '💡 ĐANG BẬT ĐÈN';
+        badge.style.background = '#23863622';
+        badge.style.color = '#3fb950';
+        badge.style.borderColor = '#23863688';
+      }
+      if (txt) txt.innerText = 'Đèn Demi 4 góc & 2 Cụm Đèn Gầm 22 LED ĐANG BẬT SÁNG LIÊN TỤC';
+      if (raceTitle) {
+        raceTitle.innerText = '💡 ĐÈN TOÀN XE: ĐANG BẬT SÁNG LIÊN TỤC';
+        raceTitle.style.color = '#3fb950';
+      }
+      if (raceBtn) {
+        raceBtn.innerText = '🚫 TẮT HẲN ĐÈN (SAU INTRO)';
+        raceBtn.style.background = 'linear-gradient(135deg,#da3633,#f85149)';
+        raceBtn.style.boxShadow = '0 0 14px rgba(248,81,73,0.4)';
+      }
+    } else {
+      if (btnOn)  btnOn.className  = 'btn';
+      if (btnOff) btnOff.className = 'btn active';
+      if (badge) {
+        badge.innerText = '🚫 ĐANG TẮT ĐÈN (Tự tắt sau Intro)';
+        badge.style.background = '#da363322';
+        badge.style.color = '#f85149';
+        badge.style.borderColor = '#da363388';
+      }
+      if (txt) txt.innerText = 'TỰ ĐỘNG TẮT HẲN 30 BÓNG ĐÈN sau khi chạy xong Intro chào mừng (Tiết kiệm pin)';
+      if (raceTitle) {
+        raceTitle.innerText = '🚫 ĐÈN TOÀN XE: ĐANG TẮT (Tự tắt sau Intro)';
+        raceTitle.style.color = '#f85149';
+      }
+      if (raceBtn) {
+        raceBtn.innerText = '💡 BẬT ĐÈN TOÀN XE';
+        raceBtn.style.background = 'linear-gradient(135deg,#238636,#2ea043)';
+        raceBtn.style.boxShadow = '0 0 14px rgba(46,160,67,0.35)';
+      }
+    }
   }
 
   let simActiveState = 'hazard'; // 'left', 'right', 'hazard', 'drl', 'off_all'
@@ -1766,10 +1878,11 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         document.querySelectorAll('.mode-card.intro-card').forEach(c => c.classList.remove('active'));
         const introTarget = document.getElementById('introCard-' + (curLedConfig.intro_mode || 'audi_rs'));
         if (introTarget) introTarget.classList.add('active');
+        updateMasterLightUI(!!curLedConfig.master_lights);
         refreshUnderglowCompetitionUI();
         startLedSimulator();
       })
-      .catch(() => { refreshUnderglowCompetitionUI(); startLedSimulator(); });
+      .catch(() => { updateMasterLightUI(!!curLedConfig.master_lights); refreshUnderglowCompetitionUI(); startLedSimulator(); });
   }
 
   // =========================================================================
@@ -2271,9 +2384,9 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 
     const doRight    = (simActiveState === 'right' || simActiveState === 'hazard');
     const doLeft     = (simActiveState === 'left'  || simActiveState === 'hazard');
-    const doTurnShow = !!curLedConfig.turn_always_fx && (simActiveState !== 'off_all');
-    const doDrl      = (curLedConfig.drl_enabled !== false || simActiveState === 'drl') && (simActiveState !== 'off_all');
-    const doUg       = (curLedConfig.ug_enabled !== false) && (curLedConfig.ug_mode !== 'off') && (simActiveState !== 'off_all');
+    const doTurnShow = !!curLedConfig.master_lights && !!curLedConfig.turn_always_fx && (simActiveState !== 'off_all');
+    const doDrl      = ((!!curLedConfig.master_lights && curLedConfig.drl_enabled !== false) || simActiveState === 'drl') && (simActiveState !== 'off_all');
+    const doUg       = ((!!curLedConfig.master_lights && curLedConfig.ug_enabled !== false) || (simActiveState === 'drl' && curLedConfig.ug_enabled !== false)) && (curLedConfig.ug_mode !== 'off') && (simActiveState !== 'off_all');
 
     // 1..3. 4 cụm góc xe (LED 0..7): Hỗ trợ cả Chế độ Show Liên Tục lẫn Chế độ Xi Nhan Khi Rẽ
     if (doTurnShow && !doRight && !doLeft) {
@@ -2453,7 +2566,15 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         q.append('u_col2', curLedConfig.ug_color2);
         q.append('u_spd', curLedConfig.ug_speed_ms);
         q.append('u_bri', curLedConfig.ug_brightness);
+        q.append('ug_enabled', (curLedConfig.ug_enabled !== false) ? '1' : '0');
         q.append('u_en', (curLedConfig.ug_enabled !== false) ? '1' : '0');
+        q.append('u_rev', curLedConfig.ug_rev_left ? '1' : '0');
+        q.append('d_en', (curLedConfig.drl_enabled !== false) ? '1' : '0');
+        q.append('t_alw', curLedConfig.turn_always_fx ? '1' : '0');
+        q.append('t_swap', curLedConfig.swap_turn_dir ? '1' : '0');
+        q.append('in_mode', curLedConfig.intro_mode || 'audi_rs');
+        q.append('in_en', (curLedConfig.intro_enabled !== false) ? '1' : '0');
+        q.append('m_light', curLedConfig.master_lights ? '1' : '0');
         q.append('save', '1');
         fetch('http://' + lastData.ip + '/set_led?' + q.toString(), { mode: 'no-cors' }).catch(()=>{});
       } catch(e){}
@@ -2494,7 +2615,8 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
       ug_enabled: true,
       ug_rev_left: false,
       intro_mode: 'audi_rs',
-      intro_enabled: true
+      intro_enabled: true,
+      master_lights: false
     };
     saveAndApplyLedConfig();
     initLedUI();
@@ -2792,15 +2914,16 @@ def api_state():
 
 @xedua_bp.route("/api/xedua/led", methods=["GET", "POST"])
 def api_led():
-    global led_config
+    global led_config, web_cfg_dirty, cfg_version
     if request.method == "POST":
         data = request.get_json(force=True, silent=True) or {}
         if "config" in data and isinstance(data["config"], dict):
             sub = data.pop("config")
             data.update(sub)
         data.pop("status", None)
+        data.pop("live", None)
 
-        p_act = data.get("preview_act") or data.get("action")
+        p_act = data.pop("preview_act", None) or data.pop("action", None)
         if p_act:
             pending_commands["test_action"] = p_act
         in_mode = data.get("intro_mode")
@@ -2809,6 +2932,10 @@ def api_led():
 
         led_config.update(data)
         save_led_config(led_config)
+        last_car_ver = int(car_state.get("cfg_ver", 0) or 0)
+        if cfg_version <= last_car_ver:
+            cfg_version = last_car_ver + 1
+        web_cfg_dirty = True
         return jsonify({"status": "ok", "message": "Đã lưu lên Render Cloud (Xe sẽ tự đồng bộ)", "config": led_config})
     return jsonify({"status": "ok", "config": led_config})
 
@@ -2843,20 +2970,25 @@ def api_ota_flash():
 
 @xedua_bp.route("/api/xedua/sync", methods=["POST"])
 def api_car_sync():
-    global cfg_version, led_config
+    global cfg_version, led_config, web_cfg_dirty
     data = request.get_json(force=True, silent=True) or {}
     car_state.update(data)
     car_state["last_seen"] = time.time()
     car_state["online"] = True
 
-    car_cfg_ver = data.get("cfg_ver", 0)
+    car_cfg_ver = int(data.get("cfg_ver", 0) or 0)
     # BẢO VỆ CẤU HÌNH XE KHI RENDER KHỞI ĐỘNG LẠI:
-    # Nếu Render vừa khởi động lại (cfg_version <= 1) mà xe đã có cấu hình trong NVS (car_cfg_ver > 1),
-    # Render không được ghi đè mặc định xuống xe, mà giữ nguyên phiên bản của xe:
-    if cfg_version <= 1 and car_cfg_ver > 1:
+    # Nếu Render vừa khởi động lại (web_cfg_dirty=False, cfg_version <= 1) mà xe đã có cấu hình trong NVS,
+    # Render giữ nguyên phiên bản của xe. Ngược lại nếu Web vừa có chỉnh sửa mới (web_cfg_dirty=True),
+    # luôn ép đồng bộ xuống xe kể cả khi xe đang có cfg_ver cao hơn!
+    if not web_cfg_dirty and cfg_version <= 1 and car_cfg_ver > 1:
         cfg_version = car_cfg_ver
+    elif web_cfg_dirty and car_cfg_ver >= cfg_version:
+        cfg_version = car_cfg_ver + 1
 
     need_cfg = (car_cfg_ver < cfg_version)
+    if not need_cfg and car_cfg_ver == cfg_version:
+        web_cfg_dirty = False
 
     resp = {
         "status": "ok",
