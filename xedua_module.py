@@ -444,6 +444,44 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     .sync-toggle-box input[type=checkbox] {
       width: 18px; height: 18px; accent-color: #00e5ff; cursor: pointer;
     }
+
+    /* Studio đổi màu riêng cho 2 Cụm Đèn Gầm */
+    .ug-color-studio {
+      background: #101626; border: 1.5px solid #bc8cff66; border-radius: 10px;
+      padding: 11px 12px; margin-bottom: 10px;
+    }
+    .ug-slot-pills {
+      display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 9px;
+    }
+    .ug-slot-btn {
+      padding: 5px 10px; border-radius: 7px; font-size: 0.72rem; font-weight: 800;
+      background: #161f33; border: 1px solid #304163; color: #c9d1d9; cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .ug-slot-btn:hover { border-color: #d2a8ff; }
+    .ug-slot-btn.active {
+      background: #2b184a; border-color: #d2a8ff; color: #fff;
+      box-shadow: 0 0 10px rgba(210, 168, 255, 0.35);
+    }
+    .ug-color-row {
+      display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
+    }
+    .ug-picker-card {
+      display: flex; align-items: center; gap: 8px; padding: 6px 10px;
+      border-radius: 9px; background: #161f33; border: 1.5px solid #2d3e5e;
+      cursor: pointer; flex: 1; min-width: 155px;
+    }
+    .ug-picker-card:hover { border-color: #d2a8ff; }
+    .ug-picker-card input[type=color] {
+      width: 36px; height: 30px; border: none; border-radius: 6px;
+      background: transparent; cursor: pointer; padding: 0;
+    }
+    .ug-duo-bar {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-top: 6px;
+    }
+    @media (max-width: 680px) {
+      .ug-duo-bar { grid-template-columns: repeat(2, 1fr); }
+    }
   </style>
 </head>
 <body>
@@ -974,6 +1012,69 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             <input type="checkbox" id="chkUgRevLeft" onchange="curLedConfig.ug_rev_left=this.checked;triggerLivePush()">
           </div>
 
+          <!-- BẢNG ĐỔI MÀU RIÊNG CHO ĐÈN GẦM (CỤM 5 & CỤM 6 — 22 LED) -->
+          <div class="ug-color-studio" id="ugColorStudioBox">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+              <span style="font-size:0.8rem;font-weight:900;color:#d2a8ff;">🎨 ĐỔI MÀU ĐÈN GẦM 22 LED (CHỌN 1 MÀU HOẶC PHỐI 2 MÀU)</span>
+              <span id="ugColorModeNote" style="font-size:0.68rem;padding:2px 8px;border-radius:6px;background:#bc8cff22;color:#d2a8ff;border:1px solid #bc8cff55;">Đang dùng bảng màu tùy chỉnh</span>
+            </div>
+
+            <div class="ug-slot-pills">
+              <button type="button" id="ugSlotBtn-both" class="ug-slot-btn active" onclick="setUgSlotMode('both', true)">✨ 1 Màu Toàn Gầm (Cả 22 LED)</button>
+              <button type="button" id="ugSlotBtn-1" class="ug-slot-btn" onclick="setUgSlotMode('1', false)">1️⃣ Chỉ chỉnh Màu 1</button>
+              <button type="button" id="ugSlotBtn-2" class="ug-slot-btn" onclick="setUgSlotMode('2', false)">2️⃣ Chỉ chỉnh Màu 2</button>
+            </div>
+
+            <div class="ug-color-row">
+              <label class="ug-picker-card" for="ugPicker1">
+                <input type="color" id="ugPicker1" value="#00E5FF" oninput="onUgPickerInput(1, this.value)">
+                <div class="target-txt">
+                  <b>Màu Gầm 1 (Chính)</b>
+                  <span id="ugHex1" style="color:#00e5ff;font-family:monospace;font-weight:800;">#00E5FF</span>
+                </div>
+              </label>
+
+              <label class="ug-picker-card" for="ugPicker2">
+                <input type="color" id="ugPicker2" value="#9D00FF" oninput="onUgPickerInput(2, this.value)">
+                <div class="target-txt">
+                  <b>Màu Gầm 2 (Phối)</b>
+                  <span id="ugHex2" style="color:#d2a8ff;font-family:monospace;font-weight:800;">#9D00FF</span>
+                </div>
+              </label>
+
+              <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+                <button type="button" class="btn" style="flex:0;min-width:auto;padding:7px 10px;font-size:0.72rem;background:#1b263b;border:1px solid #58a6ff66;color:#c9d1d9;" onclick="swapUgColors()" title="Đảo Màu 1 ↔ Màu 2">⇄ Đảo màu</button>
+                <button type="button" class="btn" style="flex:0;min-width:auto;padding:7px 10px;font-size:0.72rem;background:#191229;border:1px solid #bc8cff77;color:#d2a8ff;" onclick="jumpToUgColorWheel()">🎡 Vòng màu 360°</button>
+              </div>
+            </div>
+
+            <div style="font-size:0.69rem;font-weight:800;color:#8b949e;margin:9px 0 4px 0;text-transform:uppercase;">Chạm chọn nhanh 12 màu Neon cho Đèn Gầm (tự chuyển Đèn Ống Neon nếu đang ở Cầu Vồng):</div>
+            <div class="swatches-bar" id="ugQuickSwatches">
+              <div class="swatch-pill" onclick="applyUgQuickColor('#00E5FF')"><div class="swatch-color" style="background:#00E5FF;"></div> Xanh Tron</div>
+              <div class="swatch-pill" onclick="applyUgQuickColor('#9D00FF')"><div class="swatch-color" style="background:#9D00FF;"></div> Tím Cyber</div>
+              <div class="swatch-pill" onclick="applyUgQuickColor('#FF1133')"><div class="swatch-color" style="background:#FF1133;"></div> Đỏ Ferrari</div>
+              <div class="swatch-pill" onclick="applyUgQuickColor('#00FF66')"><div class="swatch-color" style="background:#00FF66;"></div> Xanh Venom</div>
+              <div class="swatch-pill" onclick="applyUgQuickColor('#FFFFFF')"><div class="swatch-color" style="background:#FFFFFF;"></div> Trắng Băng</div>
+              <div class="swatch-pill" onclick="applyUgQuickColor('#FFEE00')"><div class="swatch-color" style="background:#FFEE00;"></div> Vàng Lambo</div>
+              <div class="swatch-pill" onclick="applyUgQuickColor('#FF007F')"><div class="swatch-color" style="background:#FF007F;"></div> Hồng Laser</div>
+              <div class="swatch-pill" onclick="applyUgQuickColor('#FF5500')"><div class="swatch-color" style="background:#FF5500;"></div> Cam McLaren</div>
+              <div class="swatch-pill" onclick="applyUgQuickColor('#0055FF')"><div class="swatch-color" style="background:#0055FF;"></div> Xanh Bugatti</div>
+              <div class="swatch-pill" onclick="applyUgQuickColor('#00FFCC')"><div class="swatch-color" style="background:#00FFCC;"></div> Ngọc Mint</div>
+              <div class="swatch-pill" onclick="applyUgQuickColor('#FFAA00')"><div class="swatch-color" style="background:#FFAA00;"></div> Hổ Phách</div>
+              <div class="swatch-pill" onclick="applyUgQuickColor('#FF00FF')"><div class="swatch-color" style="background:#FF00FF;"></div> Tím Neon</div>
+            </div>
+
+            <div style="font-size:0.69rem;font-weight:800;color:#8b949e;margin:9px 0 4px 0;text-transform:uppercase;">Hoặc chọn nhanh 6 cặp Phối 2 Màu Siêu Xe:</div>
+            <div class="ug-duo-bar">
+              <div class="swatch-pill" onclick="applyUgDuoPreset('#00E5FF','#9D00FF')"><div class="swatch-color" style="background:linear-gradient(135deg,#00E5FF 50%,#9D00FF 50%);"></div> Cyber Tím</div>
+              <div class="swatch-pill" onclick="applyUgDuoPreset('#FF1133','#FFAA00')"><div class="swatch-color" style="background:linear-gradient(135deg,#FF1133 50%,#FFAA00 50%);"></div> Lửa Đỏ Vàng</div>
+              <div class="swatch-pill" onclick="applyUgDuoPreset('#00FF66','#00E5FF')"><div class="swatch-color" style="background:linear-gradient(135deg,#00FF66 50%,#00E5FF 50%);"></div> Matrix Nitro</div>
+              <div class="swatch-pill" onclick="applyUgDuoPreset('#FF007F','#00E5FF')"><div class="swatch-color" style="background:linear-gradient(135deg,#FF007F 50%,#00E5FF 50%);"></div> Miami Neon</div>
+              <div class="swatch-pill" onclick="applyUgDuoPreset('#0055FF','#FFFFFF')"><div class="swatch-color" style="background:linear-gradient(135deg,#0055FF 50%,#FFFFFF 50%);"></div> Băng Tuyết</div>
+              <div class="swatch-pill" onclick="applyUgDuoPreset('#FF5500','#9D00FF')"><div class="swatch-color" style="background:linear-gradient(135deg,#FF5500 50%,#9D00FF 50%);"></div> Hoàng Hôn</div>
+            </div>
+          </div>
+
           <div class="mode-card-grid" id="ugCardsGrid">
             <div class="mode-card ug-card active" id="ugCard-neon_cyber" onclick="setUgEffectMode('neon_cyber', true)">
               <div class="m-icon">🌈</div>
@@ -1440,20 +1541,62 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
       document.getElementById('dotTarget-drl').style.background = hex;
     } else if (activeColorTarget === 'ug1') {
       curLedConfig.ug_color1 = hex;
-      document.getElementById('dotTarget-ug1').style.background = hex;
+      if (ugColorSlotMode === 'both') curLedConfig.ug_color2 = hex;
+      ensureUgColorVisibleMode();
+      syncUgColorUI();
     } else if (activeColorTarget === 'ug2') {
+      ugColorSlotMode = '2';
       curLedConfig.ug_color2 = hex;
-      document.getElementById('dotTarget-ug2').style.background = hex;
+      ensureUgColorVisibleMode();
+      syncUgColorUI();
     }
 
     if (doLivePush) {
       if (activeColorTarget === 'left' || activeColorTarget === 'right') {
         const pAct = curLedConfig.turn_always_fx ? null : (curLedConfig.sync_sides ? 'hazard' : activeColorTarget);
         triggerLivePush(pAct, true, true);
+      } else if (activeColorTarget === 'ug1' || activeColorTarget === 'ug2') {
+        triggerLivePush('drl', false, true);
       } else {
         triggerLivePush('drl', true, true);
       }
     }
+  }
+
+  function isPrivateLanIp(ip) {
+    return typeof ip === 'string' && /^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(ip);
+  }
+
+  function pushLedToLocalCar(cfg, previewAct = null, saveToNvs = false) {
+    if (!lastData || !isPrivateLanIp(lastData.ip)) return;
+    try {
+      const q = new URLSearchParams();
+      if (previewAct) q.append('t_act', previewAct);
+      if (cfg.mode) q.append('t_mode', cfg.mode);
+      if (cfg.speed_ms) q.append('t_spd', cfg.speed_ms);
+      if (cfg.brightness) q.append('t_bri', cfg.brightness);
+      if (cfg.left_color) q.append('l_col', cfg.left_color);
+      if (cfg.right_color) q.append('r_col', cfg.right_color);
+      if (cfg.drl_color) q.append('d_col', cfg.drl_color);
+      if (cfg.ug_mode) q.append('u_mode', cfg.ug_mode);
+      if (cfg.ug_color1) q.append('u_col1', cfg.ug_color1);
+      if (cfg.ug_color2) q.append('u_col2', cfg.ug_color2);
+      if (cfg.ug_speed_ms) q.append('u_spd', cfg.ug_speed_ms);
+      if (cfg.ug_brightness) q.append('u_bri', cfg.ug_brightness);
+      if (cfg.ug_enabled !== undefined) {
+        q.append('ug_enabled', cfg.ug_enabled ? '1' : '0');
+        q.append('u_en', cfg.ug_enabled ? '1' : '0');
+      }
+      if (cfg.ug_rev_left !== undefined) q.append('u_rev', cfg.ug_rev_left ? '1' : '0');
+      if (cfg.drl_enabled !== undefined) q.append('d_en', cfg.drl_enabled ? '1' : '0');
+      if (cfg.turn_always_fx !== undefined) q.append('t_alw', cfg.turn_always_fx ? '1' : '0');
+      if (cfg.swap_turn_dir !== undefined) q.append('t_swap', cfg.swap_turn_dir ? '1' : '0');
+      if (cfg.intro_mode) q.append('in_mode', cfg.intro_mode);
+      if (cfg.intro_enabled !== undefined) q.append('in_en', cfg.intro_enabled ? '1' : '0');
+      if (cfg.master_lights !== undefined) q.append('m_light', cfg.master_lights ? '1' : '0');
+      if (saveToNvs) q.append('save', '1');
+      fetch('http://' + lastData.ip + '/set_led?' + q.toString(), { mode: 'no-cors' }).catch(()=>{});
+    } catch (e) {}
   }
 
   let pendingPreviewAct = null;
@@ -1468,33 +1611,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
       }
 
       // 1. TỐC ĐỘ SIÊU TỐC (~10ms): Bắn trực tiếp qua WiFi nội bộ nếu thiết bị đang cùng mạng với xe
-      if (lastData && lastData.ip && lastData.ip.startsWith('192.168.')) {
-        try {
-          const q = new URLSearchParams();
-          if (payload.preview_act) q.append('t_act', payload.preview_act);
-          if (payload.mode) q.append('t_mode', payload.mode);
-          if (payload.speed_ms) q.append('t_spd', payload.speed_ms);
-          if (payload.brightness) q.append('t_bri', payload.brightness);
-          if (payload.left_color) q.append('l_col', payload.left_color);
-          if (payload.right_color) q.append('r_col', payload.right_color);
-          if (payload.drl_color) q.append('d_col', payload.drl_color);
-          if (payload.ug_mode) q.append('u_mode', payload.ug_mode);
-          if (payload.ug_color1) q.append('u_col1', payload.ug_color1);
-          if (payload.ug_color2) q.append('u_col2', payload.ug_color2);
-          if (payload.ug_speed_ms) q.append('u_spd', payload.ug_speed_ms);
-          if (payload.ug_brightness) q.append('u_bri', payload.ug_brightness);
-          if (payload.ug_enabled !== undefined) q.append('u_en', payload.ug_enabled ? '1' : '0');
-          if (payload.ug_rev_left !== undefined) q.append('u_rev', payload.ug_rev_left ? '1' : '0');
-          if (payload.drl_enabled !== undefined) q.append('d_en', payload.drl_enabled ? '1' : '0');
-          if (payload.turn_always_fx !== undefined) q.append('t_alw', payload.turn_always_fx ? '1' : '0');
-          if (payload.swap_turn_dir !== undefined) q.append('t_swap', payload.swap_turn_dir ? '1' : '0');
-          if (payload.intro_mode) q.append('in_mode', payload.intro_mode);
-          if (payload.intro_enabled !== undefined) q.append('in_en', payload.intro_enabled ? '1' : '0');
-          if (payload.master_lights !== undefined) q.append('m_light', payload.master_lights ? '1' : '0');
-          if (saveToNvs) q.append('save', '1');
-          fetch('http://' + lastData.ip + '/set_led?' + q.toString(), { mode: 'no-cors' }).catch(()=>{});
-        } catch(e){}
-      }
+      pushLedToLocalCar(payload, payload.preview_act || null, saveToNvs);
 
       // 2. ĐỒNG BỘ LÊN RENDER CLOUD ĐỂ LƯU VÀ CÁC THIẾT BỊ KHÁC ĐỒNG BỘ
       fetch('/api/xedua/led', {
@@ -1584,13 +1701,163 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     }
   }
 
+  let ugColorSlotMode = 'both';
+
+  function showSimDrlPreview() {
+    simIntroPlaying = false;
+    simActiveState = 'drl';
+    const bL = document.getElementById('btnTestLeft');
+    const bR = document.getElementById('btnTestRight');
+    const bH = document.getElementById('btnTestHazard');
+    const bD = document.getElementById('btnTestDrl');
+    if (bL) bL.classList.remove('active');
+    if (bR) bR.classList.remove('active');
+    if (bH) bH.classList.remove('active');
+    if (bD) bD.classList.add('active');
+  }
+
+  function syncUgColorUI() {
+    const c1 = (curLedConfig.ug_color1 || '#00E5FF').toUpperCase();
+    const c2 = (curLedConfig.ug_color2 || '#9D00FF').toUpperCase();
+    const p1 = document.getElementById('ugPicker1');
+    const p2 = document.getElementById('ugPicker2');
+    const h1 = document.getElementById('ugHex1');
+    const h2 = document.getElementById('ugHex2');
+    const d1 = document.getElementById('dotTarget-ug1');
+    const d2 = document.getElementById('dotTarget-ug2');
+    if (p1) p1.value = c1;
+    if (p2) p2.value = c2;
+    if (h1) h1.innerText = c1;
+    if (h2) h2.innerText = c2;
+    if (d1) d1.style.background = c1;
+    if (d2) d2.style.background = c2;
+
+    if (activeColorTarget === 'ug1' || activeColorTarget === 'ug2') {
+      const actHex = (activeColorTarget === 'ug1') ? c1 : c2;
+      const disp = document.getElementById('activeHexDisplay');
+      const nat  = document.getElementById('nativeColorInput');
+      if (disp) disp.innerText = actHex;
+      if (nat)  nat.value = actHex;
+    }
+
+    ['both', '1', '2'].forEach(slot => {
+      const btn = document.getElementById('ugSlotBtn-' + slot);
+      if (btn) btn.classList.toggle('active', ugColorSlotMode === slot);
+    });
+
+    const noteEl = document.getElementById('ugColorModeNote');
+    if (noteEl) {
+      const ugM = curLedConfig.ug_mode || 'neon_cyber';
+      if (ugM === 'neon_cyber' || ugM === 'police_pursuit') {
+        noteEl.innerText = '🌈 Chế độ Cầu Vồng/Cảnh Sát (Chạm màu sẽ tự chuyển Đèn Ống Neon)';
+        noteEl.style.background = '#d2992222';
+        noteEl.style.color = '#e3b341';
+        noteEl.style.borderColor = '#d2992266';
+      } else {
+        noteEl.innerText = (c1 === c2)
+          ? `✨ Đang dùng 1 màu (${c1}) cho cả 22 LED`
+          : `🎨 Đang phối 2 màu (${c1} ↔ ${c2})`;
+        noteEl.style.background = '#23863622';
+        noteEl.style.color = '#3fb950';
+        noteEl.style.borderColor = '#23863688';
+      }
+    }
+  }
+
+  function setUgSlotMode(slot, syncNow = false) {
+    ugColorSlotMode = slot;
+    if (slot === 'both' && syncNow) {
+      curLedConfig.ug_color2 = curLedConfig.ug_color1;
+      commitUgColorChange(`🎨 Đã đồng bộ cả 22 bóng Đèn Gầm sang 1 màu ${curLedConfig.ug_color1}!`);
+    } else {
+      syncUgColorUI();
+    }
+  }
+
+  function ensureUgColorVisibleMode() {
+    let switched = false;
+    curLedConfig.ug_enabled = true;
+    refreshUnderglowCompetitionUI();
+    if (!curLedConfig.ug_mode || curLedConfig.ug_mode === 'neon_cyber' || curLedConfig.ug_mode === 'police_pursuit' || curLedConfig.ug_mode === 'off') {
+      setUgEffectMode('solid_neon', false);
+      switched = true;
+    }
+    showSimDrlPreview();
+    return switched;
+  }
+
+  function commitUgColorChange(customMsg = null, immediatePush = true) {
+    const switchedToSolid = ensureUgColorVisibleMode();
+    syncUgColorUI();
+    triggerLivePush('drl', immediatePush, true);
+    const logEl = document.getElementById('ledStatusLog');
+    if (logEl) {
+      const masterHint = curLedConfig.master_lights ? '' : ' (Xem trước 20s — Bật 💡 ĐÈN XE nếu muốn sáng hoài)';
+      const modeHint = switchedToSolid ? ' • Đã tự chuyển sang Đèn Ống Neon để hiện đúng màu!' : '';
+      logEl.innerText = (customMsg || `🎨 Đã cập nhật màu Đèn Gầm: ${curLedConfig.ug_color1} ↔ ${curLedConfig.ug_color2}`) + modeHint + masterHint;
+      logEl.style.color = '#d2a8ff';
+    }
+  }
+
+  function onUgPickerInput(which, hex) {
+    hex = hex.toUpperCase();
+    if (which === 1) {
+      curLedConfig.ug_color1 = hex;
+      if (ugColorSlotMode === 'both') curLedConfig.ug_color2 = hex;
+    } else {
+      ugColorSlotMode = '2';
+      curLedConfig.ug_color2 = hex;
+    }
+    commitUgColorChange(null, false);
+  }
+
+  function applyUgQuickColor(hex) {
+    hex = hex.toUpperCase();
+    if (ugColorSlotMode === 'both') {
+      curLedConfig.ug_color1 = hex;
+      curLedConfig.ug_color2 = hex;
+    } else if (ugColorSlotMode === '1') {
+      curLedConfig.ug_color1 = hex;
+    } else {
+      curLedConfig.ug_color2 = hex;
+    }
+    commitUgColorChange(`🎨 Đã đổi màu Đèn Gầm sang ${hex}!`, true);
+  }
+
+  function applyUgDuoPreset(c1, c2) {
+    ugColorSlotMode = '1';
+    curLedConfig.ug_color1 = c1.toUpperCase();
+    curLedConfig.ug_color2 = c2.toUpperCase();
+    commitUgColorChange(`🌈 Đã phối 2 màu Đèn Gầm: ${c1.toUpperCase()} ↔ ${c2.toUpperCase()}!`, true);
+  }
+
+  function swapUgColors() {
+    const tmp = curLedConfig.ug_color1;
+    curLedConfig.ug_color1 = curLedConfig.ug_color2;
+    curLedConfig.ug_color2 = tmp;
+    if (curLedConfig.ug_color1 !== curLedConfig.ug_color2 && ugColorSlotMode === 'both') {
+      ugColorSlotMode = '1';
+    }
+    commitUgColorChange(`⇄ Đã đảo ngược 2 màu Đèn Gầm: ${curLedConfig.ug_color1} ↔ ${curLedConfig.ug_color2}!`, true);
+  }
+
+  function jumpToUgColorWheel() {
+    const slot = (ugColorSlotMode === '2') ? 'ug2' : 'ug1';
+    selectColorTarget(slot);
+    const tab = document.getElementById('tabTarget-' + slot);
+    if (tab && tab.scrollIntoView) tab.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
   function setUgEffectMode(ugMode, userClicked = false) {
     curLedConfig.ug_mode = ugMode;
     curLedConfig.ug_enabled = true;
     document.querySelectorAll('.mode-card.ug-card').forEach(c => c.classList.remove('active'));
     const target = document.getElementById('ugCard-' + ugMode);
     if (target) target.classList.add('active');
+    syncUgColorUI();
     if (userClicked) {
+      refreshUnderglowCompetitionUI();
+      showSimDrlPreview();
       triggerLivePush('drl', true, true);
       const logEl = document.getElementById('ledStatusLog');
       if (logEl) {
@@ -1872,9 +2139,15 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         document.getElementById('sUgBr').value = curLedConfig.ug_brightness || 85;
         document.getElementById('lUgBr').innerText = (curLedConfig.ug_brightness || 85) + '%';
 
+        const c1u = (curLedConfig.ug_color1 || '#00E5FF').toUpperCase();
+        const c2u = (curLedConfig.ug_color2 || '#9D00FF').toUpperCase();
+        const isFactoryRainbow = ((curLedConfig.ug_mode || 'neon_cyber') === 'neon_cyber' && c1u === '#00E5FF' && c2u === '#9D00FF');
+        ugColorSlotMode = (c1u === c2u || isFactoryRainbow) ? 'both' : '1';
+
         selectColorTarget('left');
         setEffectMode(curLedConfig.mode || 'audi');
         setUgEffectMode(curLedConfig.ug_mode || 'neon_cyber');
+        syncUgColorUI();
         document.querySelectorAll('.mode-card.intro-card').forEach(c => c.classList.remove('active'));
         const introTarget = document.getElementById('introCard-' + (curLedConfig.intro_mode || 'audi_rs'));
         if (introTarget) introTarget.classList.add('active');
@@ -1882,7 +2155,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         refreshUnderglowCompetitionUI();
         startLedSimulator();
       })
-      .catch(() => { updateMasterLightUI(!!curLedConfig.master_lights); refreshUnderglowCompetitionUI(); startLedSimulator(); });
+      .catch(() => { syncUgColorUI(); updateMasterLightUI(!!curLedConfig.master_lights); refreshUnderglowCompetitionUI(); startLedSimulator(); });
   }
 
   // =========================================================================
@@ -2531,7 +2804,14 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     const fxUnderglow = document.getElementById('fxUnderglow');
     if (fxUnderglow) {
       if (doUg) {
-        fxUnderglow.style.background = `linear-gradient(180deg, ${curLedConfig.ug_color1}, ${curLedConfig.ug_color2})`;
+        const ugModeSim = curLedConfig.ug_mode || 'neon_cyber';
+        if (ugModeSim === 'neon_cyber') {
+          fxUnderglow.style.background = 'linear-gradient(90deg, #ff1133, #ffaa00, #00ff66, #00e5ff, #9d00ff)';
+        } else if (ugModeSim === 'police_pursuit') {
+          fxUnderglow.style.background = 'linear-gradient(90deg, #ff0018, #ffffff, #0066ff)';
+        } else {
+          fxUnderglow.style.background = `linear-gradient(180deg, ${curLedConfig.ug_color1}, ${curLedConfig.ug_color2})`;
+        }
         fxUnderglow.style.opacity = '0.45';
       } else if (doRight || doLeft) {
         fxUnderglow.style.background = doLeft ? curLedConfig.left_color : curLedConfig.right_color;
@@ -2551,34 +2831,8 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     const logEl = document.getElementById('ledStatusLog');
     logEl.innerText = 'Đang lưu cấu hình 6 cụm LED và truyền xuống xe qua WiFi...';
 
-    // Bắn trực tiếp qua WiFi nội bộ nếu có local IP
-    if (lastData && lastData.ip && lastData.ip.startsWith('192.168.')) {
-      try {
-        const q = new URLSearchParams();
-        q.append('t_mode', curLedConfig.mode);
-        q.append('t_spd', curLedConfig.speed_ms);
-        q.append('t_bri', curLedConfig.brightness);
-        q.append('l_col', curLedConfig.left_color);
-        q.append('r_col', curLedConfig.right_color);
-        q.append('d_col', curLedConfig.drl_color);
-        q.append('u_mode', curLedConfig.ug_mode);
-        q.append('u_col1', curLedConfig.ug_color1);
-        q.append('u_col2', curLedConfig.ug_color2);
-        q.append('u_spd', curLedConfig.ug_speed_ms);
-        q.append('u_bri', curLedConfig.ug_brightness);
-        q.append('ug_enabled', (curLedConfig.ug_enabled !== false) ? '1' : '0');
-        q.append('u_en', (curLedConfig.ug_enabled !== false) ? '1' : '0');
-        q.append('u_rev', curLedConfig.ug_rev_left ? '1' : '0');
-        q.append('d_en', (curLedConfig.drl_enabled !== false) ? '1' : '0');
-        q.append('t_alw', curLedConfig.turn_always_fx ? '1' : '0');
-        q.append('t_swap', curLedConfig.swap_turn_dir ? '1' : '0');
-        q.append('in_mode', curLedConfig.intro_mode || 'audi_rs');
-        q.append('in_en', (curLedConfig.intro_enabled !== false) ? '1' : '0');
-        q.append('m_light', curLedConfig.master_lights ? '1' : '0');
-        q.append('save', '1');
-        fetch('http://' + lastData.ip + '/set_led?' + q.toString(), { mode: 'no-cors' }).catch(()=>{});
-      } catch(e){}
-    }
+    // Bắn trực tiếp qua WiFi nội bộ nếu có local IP (192.168.x / 172.16-31.x / 10.x)
+    pushLedToLocalCar(curLedConfig, null, true);
 
     try {
       const res = await fetch('/api/xedua/led', {
@@ -2618,6 +2872,8 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
       intro_enabled: true,
       master_lights: false
     };
+    ugColorSlotMode = 'both';
+    syncUgColorUI();
     saveAndApplyLedConfig();
     initLedUI();
   }
