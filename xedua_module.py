@@ -482,6 +482,110 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     @media (max-width: 680px) {
       .ug-duo-bar { grid-template-columns: repeat(2, 1fr); }
     }
+
+    /* Cloud Sync Banner */
+    .cloud-sync-banner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 14px; border-radius: 10px; background: #081220;
+      border: 1.5px solid #00e5ff66; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;
+      box-shadow: 0 0 16px rgba(0, 229, 255, 0.15);
+    }
+    .cs-status {
+      display: flex; align-items: center; gap: 9px;
+      font-size: 0.82rem; font-weight: 800; color: #00e5ff;
+    }
+    .cs-dot {
+      width: 10px; height: 10px; border-radius: 50%; background: #00e5ff;
+      box-shadow: 0 0 8px #00e5ff; flex-shrink: 0;
+    }
+    .cs-dot.syncing {
+      background: #ff9900; box-shadow: 0 0 12px #ff9900;
+      animation: csPulse 0.6s infinite alternate;
+    }
+    .cs-dot.synced {
+      background: #3fb950; box-shadow: 0 0 12px #3fb950;
+    }
+    .cs-sub { font-size: 0.72rem; color: #8b949e; }
+    @keyframes csPulse { 0% { transform: scale(0.85); opacity: 0.5; } 100% { transform: scale(1.25); opacity: 1; } }
+
+    /* Custom Dropdown Selector Styling */
+    .fx-dropdown {
+      position: relative; width: 100%; margin-top: 8px; margin-bottom: 12px;
+    }
+    .fx-dropdown-trigger {
+      width: 100%; padding: 12px 14px; background: #101828;
+      border: 1.5px solid #283a57; border-radius: 12px;
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; transition: all 0.2s ease; user-select: none;
+    }
+    .fx-dropdown-trigger:hover {
+      background: #152238; border-color: #00e5ff;
+      box-shadow: 0 0 12px rgba(0, 229, 255, 0.2);
+    }
+    .fx-dropdown.open .fx-dropdown-trigger {
+      border-color: #00e5ff; box-shadow: 0 0 16px rgba(0, 229, 255, 0.35);
+      border-bottom-left-radius: 4px; border-bottom-right-radius: 4px;
+    }
+    .fx-dropdown-active-info {
+      display: flex; align-items: center; gap: 12px; overflow: hidden;
+    }
+    .fx-dropdown-active-info .m-icon {
+      font-size: 1.6rem; flex-shrink: 0;
+    }
+    .fx-dropdown-active-text {
+      display: flex; flex-direction: column; text-align: left;
+    }
+    .fx-dropdown-active-text .title {
+      font-size: 0.9rem; font-weight: 800; color: #fff; line-height: 1.2;
+    }
+    .fx-dropdown-active-text .desc {
+      font-size: 0.72rem; color: #8b949e; margin-top: 2px;
+    }
+    .dropdown-arrow {
+      font-size: 0.8rem; font-weight: 800; color: #00e5ff;
+      padding: 5px 10px; border-radius: 8px;
+      background: rgba(0, 229, 255, 0.12); border: 1px solid rgba(0, 229, 255, 0.3);
+      display: flex; align-items: center; gap: 5px; transition: all 0.25s ease;
+      white-space: nowrap; flex-shrink: 0; margin-left: 8px;
+    }
+    .fx-dropdown.open .dropdown-arrow {
+      background: rgba(0, 229, 255, 0.3); color: #fff;
+      transform: translateY(-1px);
+    }
+    .fx-dropdown-menu {
+      display: none; width: 100%; margin-top: 6px;
+      background: #090e18; border: 1.5px solid #22344f;
+      border-radius: 12px; padding: 12px; z-index: 50;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.8);
+      animation: fxSlideDown 0.2s ease-out;
+    }
+    .fx-dropdown.open .fx-dropdown-menu {
+      display: block;
+    }
+    .dropdown-menu-hint {
+      font-size: 0.72rem; font-weight: 700; color: #8b949e; margin-bottom: 8px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    @keyframes fxSlideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Buttons for Collapsible Drawer */
+    .btn-toggle-drawer {
+      background: #141f33; border: 1px solid #00e5ff66; color: #00e5ff;
+      padding: 5px 12px; border-radius: 8px; font-size: 0.73rem; font-weight: 800;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+      transition: all 0.18s ease;
+    }
+    .btn-toggle-drawer:hover {
+      background: #00e5ff22; color: #fff; border-color: #00e5ff;
+    }
+    .inline-color-pick {
+      width: 22px; height: 22px; border: none; border-radius: 5px;
+      background: transparent; cursor: pointer; padding: 0; margin-left: auto;
+      flex-shrink: 0;
+    }
   </style>
 </head>
 <body>
@@ -673,6 +777,14 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
        TAB 2: STUDIO DÀN ĐÈN 6 CỤM WS2812B 5V (30 BÓNG ĐIỀU KHIỂN TỪNG CON LED)
        ======================================================================= -->
   <div id="tabLedContent" class="tab-content">
+    <!-- Cloud Sync Banner -->
+    <div class="cloud-sync-banner" id="cloudSyncBanner">
+      <div class="cs-status">
+        <span class="cs-dot" id="csDot"></span>
+        <span class="cs-text" id="csText">☁️ CLOUD RENDER: SẴN SÀNG ĐỒNG BỘ</span>
+      </div>
+      <div class="cs-sub" id="csSub">Chạm chọn hiệu ứng hoặc màu ➜ Xe tự động cập nhật trong 1-3s</div>
+    </div>
     <div class="led-grid">
       <!-- Cột trái: Mô phỏng trực quan 30 bóng LED trên 6 cụm của xe -->
       <div class="car-sim-card">
@@ -782,88 +894,61 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 
       <!-- Cột phải: Bàn xoay màu 360° + Dải quang phổ cầu vồng + 12 Hiệu ứng Xi Nhan + 16 Hiệu ứng Đèn Gầm -->
       <div class="right-col">
-        <!-- 1. BẢNG VÒNG TRÒN MÀU 360° & QUANG PHỔ CẦU VỒNG (NHƯ HÌNH GỬI) -->
+        <!-- 1. BẢNG PHỐI MÀU GỌN GÀNG (16.7 TRIỆU SẮC) -->
         <div class="panel" style="border-color:#00e5ff77;">
           <div class="ptitle" style="color:#00e5ff;">
-            <span>🎨 BẢNG VÒNG TRÒN MÀU 360° & DẢI QUANG PHỔ CẦU VỒNG (16.7 TRIỆU MÀU)</span>
-            <span id="liveSyncBadge" style="font-size:0.72rem;color:#3fb950;">⚡ CHẠM KÉO ĐỔI MÀU TỨC THÌ</span>
+            <span>🎨 BẢNG PHỐI MÀU XI NHAN, DEMI & GẦM</span>
+            <button type="button" class="btn-toggle-drawer" onclick="toggleColorStudioDetail()">
+              <span id="arrowColorStudio" class="dropdown-arrow">▼</span> <span id="btnTxtColorStudio">MỞ VÒNG MÀU 360°</span>
+            </button>
           </div>
 
-          <div style="font-size:0.74rem;color:#9ecbff;margin-bottom:8px;">
-            <b>Bước 1:</b> Chọn cụm đèn muốn phối màu ở dưới ➜ <b>Bước 2:</b> Xoay <b>Vòng Tròn Màu</b> hoặc kéo trên <b>Bảng Dải Cầu Vồng</b> (như hình bạn gửi):
-          </div>
-
-          <!-- 5 Nút chọn vùng đèn đang chỉnh màu -->
+          <!-- 5 Nút chọn vùng đèn đang chỉnh màu kèm ô đổi màu nhanh -->
           <div class="target-tabs">
             <div id="tabTarget-left" class="target-pill active" onclick="selectColorTarget('left')">
               <div id="dotTarget-left" class="target-dot" style="background:#FFAA00;"></div>
               <div class="target-txt">
                 <b>Xi Nhan Trái</b>
-                <span>Cụm 2 & Cụm 3 (4 LED)</span>
+                <span id="txtHex-left">#FFAA00</span>
               </div>
+              <input type="color" class="inline-color-pick" id="quickPicker-left" value="#FFAA00" onclick="event.stopPropagation()" oninput="selectColorTarget('left');applyColorToActiveTarget(this.value, true)" title="Chạm đổi màu nhanh">
             </div>
             <div id="tabTarget-right" class="target-pill" onclick="selectColorTarget('right')">
               <div id="dotTarget-right" class="target-dot" style="background:#FFAA00;"></div>
               <div class="target-txt">
                 <b>Xi Nhan Phải</b>
-                <span>Cụm 1 & Cụm 4 (4 LED)</span>
+                <span id="txtHex-right">#FFAA00</span>
               </div>
+              <input type="color" class="inline-color-pick" id="quickPicker-right" value="#FFAA00" onclick="event.stopPropagation()" oninput="selectColorTarget('right');applyColorToActiveTarget(this.value, true)" title="Chạm đổi màu nhanh">
             </div>
             <div id="tabTarget-drl" class="target-pill" onclick="selectColorTarget('drl')">
               <div id="dotTarget-drl" class="target-dot" style="background:#00E5FF;"></div>
               <div class="target-txt">
-                <b>Đèn Demi Góc</b>
-                <span>Nền 4 cụm khi đi thẳng</span>
+                <b>Đèn Demi</b>
+                <span id="txtHex-drl">#00E5FF</span>
               </div>
+              <input type="color" class="inline-color-pick" id="quickPicker-drl" value="#00E5FF" onclick="event.stopPropagation()" oninput="selectColorTarget('drl');applyColorToActiveTarget(this.value, true)" title="Chạm đổi màu nhanh">
             </div>
             <div id="tabTarget-ug1" class="target-pill" onclick="selectColorTarget('ug1')">
               <div id="dotTarget-ug1" class="target-dot" style="background:#00E5FF;"></div>
               <div class="target-txt">
-                <b>Đèn Gầm (Màu 1)</b>
-                <span>Cụm 5 & 6 Chính (22 LED)</span>
+                <b>Gầm Màu 1</b>
+                <span id="txtHex-ug1">#00E5FF</span>
               </div>
+              <input type="color" class="inline-color-pick" id="quickPicker-ug1" value="#00E5FF" onclick="event.stopPropagation()" oninput="selectColorTarget('ug1');applyColorToActiveTarget(this.value, true)" title="Chạm đổi màu nhanh">
             </div>
             <div id="tabTarget-ug2" class="target-pill" onclick="selectColorTarget('ug2')">
               <div id="dotTarget-ug2" class="target-dot" style="background:#9D00FF;"></div>
               <div class="target-txt">
-                <b>Đèn Gầm (Màu 2)</b>
-                <span>Màu phối sóng / Lửa / Sao</span>
+                <b>Gầm Màu 2</b>
+                <span id="txtHex-ug2">#9D00FF</span>
               </div>
+              <input type="color" class="inline-color-pick" id="quickPicker-ug2" value="#9D00FF" onclick="event.stopPropagation()" oninput="selectColorTarget('ug2');applyColorToActiveTarget(this.value, true)" title="Chạm đổi màu nhanh">
             </div>
-          </div>
-
-          <!-- Bàn xoay Vòng Tròn Màu 360° + Bảng Quang Phổ Cầu Vồng 2D (y hệt ảnh gửi) -->
-          <div class="color-studio-wrap">
-            <!-- Vòng Tròn Màu 360° -->
-            <div class="wheel-box" title="Kéo chuột trên Vòng Tròn Màu 360°">
-              <canvas id="colorWheelCanvas" width="220" height="220"></canvas>
-              <div id="wheelCursor" class="wheel-cursor"></div>
-            </div>
-
-            <!-- Bảng Dải Quang Phổ Cầu Vồng 2D (Giống hệt hình bạn gửi) -->
-            <div class="spectrum-box-wrap">
-              <div class="spectrum-canvas-holder" title="Kéo chuột trên Bảng Dải Cầu Vồng Đa Sắc">
-                <canvas id="rainbowSpectrumCanvas" width="460" height="160"></canvas>
-                <div id="spectrumCursor" class="spectrum-cursor"></div>
-              </div>
-
-              <!-- Thanh chỉnh độ đậm / độ sáng màu + Mã HEX -->
-              <div class="srow" style="margin-bottom:0;">
-                <label style="width:125px;font-size:0.75rem;">Độ rực màu (Value)</label>
-                <input type="range" id="sColorVal" min="15" max="100" value="100" oninput="onColorValSliderChange(this.value)">
-                <input type="color" id="nativeColorInput" value="#FFAA00" oninput="applyColorToActiveTarget(this.value, true)" style="width:34px;height:30px;border:none;background:transparent;cursor:pointer;">
-                <span id="activeHexDisplay" class="c-hex" style="width:82px;text-align:center;">#FFAA00</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="sync-toggle-box">
-            <span>🔗 Khóa đồng bộ màu Xi Nhan Trái & Phải (Chỉnh 1 bên ăn cả 4 cụm xi nhan)</span>
-            <input type="checkbox" id="chkSyncSides" checked onchange="toggleSyncSides(this.checked)">
           </div>
 
           <!-- 12 Màu Mẫu Siêu Xe One-Click -->
-          <div style="font-size:0.72rem;font-weight:800;color:#8b949e;text-transform:uppercase;">Chạm chọn nhanh màu Siêu Xe cho vùng đang chọn:</div>
+          <div style="font-size:0.72rem;font-weight:800;color:#8b949e;text-transform:uppercase;margin:6px 0 4px 0;">Chạm chọn nhanh màu Siêu Xe cho vùng đang chọn:</div>
           <div class="swatches-bar">
             <div class="swatch-pill" onclick="applyPreset('#FFAA00')"><div class="swatch-color" style="background:#FFAA00;"></div> Hổ Phách</div>
             <div class="swatch-pill" onclick="applyPreset('#00E5FF')"><div class="swatch-color" style="background:#00E5FF;"></div> Xanh Tron</div>
@@ -877,6 +962,33 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             <div class="swatch-pill" onclick="applyPreset('#0055FF')"><div class="swatch-color" style="background:#0055FF;"></div> Xanh Bugatti</div>
             <div class="swatch-pill" onclick="applyPreset('#00FFCC')"><div class="swatch-color" style="background:#00FFCC;"></div> Ngọc Mint</div>
             <div class="swatch-pill" onclick="applyPreset('#FF00FF')"><div class="swatch-color" style="background:#FF00FF;"></div> Tím Neon</div>
+          </div>
+
+          <div class="sync-toggle-box" style="margin-top:8px;">
+            <span>🔗 Khóa đồng bộ màu Xi Nhan Trái & Phải</span>
+            <input type="checkbox" id="chkSyncSides" checked onchange="toggleSyncSides(this.checked)">
+          </div>
+
+          <!-- BÀN XOAY VÒNG MÀU 360° & QUANG PHỔ (GẬP/MỞ THEO MŨI TÊN) -->
+          <div id="colorStudioDetailDrawer" class="color-studio-wrap" style="display:none;margin-top:10px;">
+            <div class="wheel-box" title="Kéo chuột trên Vòng Tròn Màu 360°">
+              <canvas id="colorWheelCanvas" width="220" height="220"></canvas>
+              <div id="wheelCursor" class="wheel-cursor"></div>
+            </div>
+
+            <div class="spectrum-box-wrap">
+              <div class="spectrum-canvas-holder" title="Kéo chuột trên Bảng Dải Cầu Vồng Đa Sắc">
+                <canvas id="rainbowSpectrumCanvas" width="460" height="160"></canvas>
+                <div id="spectrumCursor" class="spectrum-cursor"></div>
+              </div>
+
+              <div class="srow" style="margin-bottom:0;">
+                <label style="width:125px;font-size:0.75rem;">Độ rực màu (Value)</label>
+                <input type="range" id="sColorVal" min="15" max="100" value="100" oninput="onColorValSliderChange(this.value)">
+                <input type="color" id="nativeColorInput" value="#FFAA00" oninput="applyColorToActiveTarget(this.value, true)" style="width:34px;height:30px;border:none;background:transparent;cursor:pointer;">
+                <span id="activeHexDisplay" class="c-hex" style="width:82px;text-align:center;">#FFAA00</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -916,66 +1028,82 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             <span>🔄 Đảo ngược chiều Xi Nhan Trái ↔ Phải (Mặc định <b>TẮT</b> đã chuẩn theo thước lái xe — chỉ bật nếu lắp ngược Servo)</span>
             <input type="checkbox" id="chkSwapTurnDir" onchange="curLedConfig.swap_turn_dir=this.checked;triggerLivePush()">
           </div>
-          <div class="mode-card-grid">
-            <div class="mode-card active" id="modeCard-audi" onclick="setEffectMode('audi', true)">
-              <div class="m-icon">🌊</div>
-              <div class="m-name">1. Audi Matrix</div>
-              <div class="m-desc">Quét đuổi bóng 1 ➜ 2</div>
+          <!-- DROPDOWN CHỌN HIỆU ỨNG XI NHAN (12 CHẾ ĐỘ) -->
+          <div class="fx-dropdown" id="turnDropdown">
+            <div class="fx-dropdown-trigger" onclick="toggleDropdown('turnDropdown')">
+              <div class="fx-dropdown-active-info">
+                <span class="m-icon" id="turnActiveIcon">🌊</span>
+                <div class="fx-dropdown-active-text">
+                  <div class="title" id="turnActiveName">1. Audi Matrix</div>
+                  <div class="desc" id="turnActiveDesc">Quét đuổi bóng 1 ➜ 2</div>
+                </div>
+              </div>
+              <span class="dropdown-arrow"><span id="arrowTurnIcon">▼</span> CHỌN HIỆU ỨNG</span>
             </div>
-            <div class="mode-card" id="modeCard-standard" onclick="setEffectMode('standard', true)">
-              <div class="m-icon">⚡</div>
-              <div class="m-name">2. Chớp Chuẩn Đua</div>
-              <div class="m-desc">Nháy đồng bộ 2 bóng</div>
-            </div>
-            <div class="mode-card" id="modeCard-strobe_f1" onclick="setEffectMode('strobe_f1', true)">
-              <div class="m-icon">🚨</div>
-              <div class="m-name">3. F1 Triple Strobe</div>
-              <div class="m-desc">Chớp 3 nhịp siêu tốc F1</div>
-            </div>
-            <div class="mode-card" id="modeCard-pingpong" onclick="setEffectMode('pingpong', true)">
-              <div class="m-icon">🏓</div>
-              <div class="m-name">4. Đảo Pha Trong-Ngoài</div>
-              <div class="m-desc">Bóng 1 & 2 nháy luân phiên</div>
-            </div>
-            <div class="mode-card" id="modeCard-front_rear" onclick="setEffectMode('front_rear', true)">
-              <div class="m-icon">🔄</div>
-              <div class="m-name">5. Đuổi Trước ➜ Đuôi</div>
-              <div class="m-desc">Cụm Trước truyền xuống Đuôi</div>
-            </div>
-            <div class="mode-card" id="modeCard-pulse" onclick="setEffectMode('pulse', true)">
-              <div class="m-icon">💓</div>
-              <div class="m-name">6. Nhịp Thở Êm</div>
-              <div class="m-desc">Sáng mờ dần theo hàm Sin</div>
-            </div>
-            <div class="mode-card" id="modeCard-heartbeat" onclick="setEffectMode('heartbeat', true)">
-              <div class="m-icon">❤️</div>
-              <div class="m-name">7. Nhịp Tim Kép</div>
-              <div class="m-desc">Đập 2 nhịp Thịch-Thịch</div>
-            </div>
-            <div class="mode-card" id="modeCard-sparkle" onclick="setEffectMode('sparkle', true)">
-              <div class="m-icon">✨</div>
-              <div class="m-name">8. Kim Cương Flash</div>
-              <div class="m-desc">Chớp hạt trắng Diamond</div>
-            </div>
-            <div class="mode-card" id="modeCard-police_turn" onclick="setEffectMode('police_turn', true)">
-              <div class="m-icon">🚓</div>
-              <div class="m-name">9. Cảnh Sát Đuổi Pha</div>
-              <div class="m-desc">Chớp Đỏ-Xanh Trước/Sau</div>
-            </div>
-            <div class="mode-card" id="modeCard-laser_shot" onclick="setEffectMode('laser_shot', true)">
-              <div class="m-icon">☄️</div>
-              <div class="m-name">10. Phóng Tia Laser</div>
-              <div class="m-desc">Bắn tia nhanh có đuôi mờ</div>
-            </div>
-            <div class="mode-card" id="modeCard-rainbow_turn" onclick="setEffectMode('rainbow_turn', true)">
-              <div class="m-icon">🌈</div>
-              <div class="m-name">11. Cầu Vồng Rẽ</div>
-              <div class="m-desc">Xoay 7 sắc trên cụm rẽ</div>
-            </div>
-            <div class="mode-card" id="modeCard-plasma_dual" onclick="setEffectMode('plasma_dual', true)">
-              <div class="m-icon">🔥</div>
-              <div class="m-name">12. Phối 2 Màu Morph</div>
-              <div class="m-desc">Trộn màu Xi Nhan & Demi</div>
+            <div class="fx-dropdown-menu">
+              <div class="dropdown-menu-hint">⚡ Bấm vào hiệu ứng bên dưới để xe đổi ngay:</div>
+              <div class="mode-card-grid">
+                <div class="mode-card active" id="modeCard-audi" onclick="setEffectMode('audi', true)">
+                  <div class="m-icon">🌊</div>
+                  <div class="m-name">1. Audi Matrix</div>
+                  <div class="m-desc">Quét đuổi bóng 1 ➜ 2</div>
+                </div>
+                <div class="mode-card" id="modeCard-standard" onclick="setEffectMode('standard', true)">
+                  <div class="m-icon">⚡</div>
+                  <div class="m-name">2. Chớp Chuẩn Đua</div>
+                  <div class="m-desc">Nháy đồng bộ 2 bóng</div>
+                </div>
+                <div class="mode-card" id="modeCard-strobe_f1" onclick="setEffectMode('strobe_f1', true)">
+                  <div class="m-icon">🚨</div>
+                  <div class="m-name">3. F1 Triple Strobe</div>
+                  <div class="m-desc">Chớp 3 nhịp siêu tốc F1</div>
+                </div>
+                <div class="mode-card" id="modeCard-pingpong" onclick="setEffectMode('pingpong', true)">
+                  <div class="m-icon">🏓</div>
+                  <div class="m-name">4. Đảo Pha Trong-Ngoài</div>
+                  <div class="m-desc">Bóng 1 & 2 nháy luân phiên</div>
+                </div>
+                <div class="mode-card" id="modeCard-front_rear" onclick="setEffectMode('front_rear', true)">
+                  <div class="m-icon">🔄</div>
+                  <div class="m-name">5. Đuổi Trước ➜ Đuôi</div>
+                  <div class="m-desc">Cụm Trước truyền xuống Đuôi</div>
+                </div>
+                <div class="mode-card" id="modeCard-pulse" onclick="setEffectMode('pulse', true)">
+                  <div class="m-icon">💓</div>
+                  <div class="m-name">6. Nhịp Thở Êm</div>
+                  <div class="m-desc">Sáng mờ dần theo hàm Sin</div>
+                </div>
+                <div class="mode-card" id="modeCard-heartbeat" onclick="setEffectMode('heartbeat', true)">
+                  <div class="m-icon">❤️</div>
+                  <div class="m-name">7. Nhịp Tim Kép</div>
+                  <div class="m-desc">Đập 2 nhịp Thịch-Thịch</div>
+                </div>
+                <div class="mode-card" id="modeCard-sparkle" onclick="setEffectMode('sparkle', true)">
+                  <div class="m-icon">✨</div>
+                  <div class="m-name">8. Kim Cương Flash</div>
+                  <div class="m-desc">Chớp hạt trắng Diamond</div>
+                </div>
+                <div class="mode-card" id="modeCard-police_turn" onclick="setEffectMode('police_turn', true)">
+                  <div class="m-icon">🚓</div>
+                  <div class="m-name">9. Cảnh Sát Đuổi Pha</div>
+                  <div class="m-desc">Chớp Đỏ-Xanh Trước/Sau</div>
+                </div>
+                <div class="mode-card" id="modeCard-laser_shot" onclick="setEffectMode('laser_shot', true)">
+                  <div class="m-icon">☄️</div>
+                  <div class="m-name">10. Phóng Tia Laser</div>
+                  <div class="m-desc">Bắn tia nhanh có đuôi mờ</div>
+                </div>
+                <div class="mode-card" id="modeCard-rainbow_turn" onclick="setEffectMode('rainbow_turn', true)">
+                  <div class="m-icon">🌈</div>
+                  <div class="m-name">11. Cầu Vồng Rẽ</div>
+                  <div class="m-desc">Xoay 7 sắc trên cụm rẽ</div>
+                </div>
+                <div class="mode-card" id="modeCard-plasma_dual" onclick="setEffectMode('plasma_dual', true)">
+                  <div class="m-icon">🔥</div>
+                  <div class="m-name">12. Phối 2 Màu Morph</div>
+                  <div class="m-desc">Trộn màu Xi Nhan & Demi</div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="srow" style="margin-top:12px;">
@@ -1075,86 +1203,102 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             </div>
           </div>
 
-          <div class="mode-card-grid" id="ugCardsGrid">
-            <div class="mode-card ug-card active" id="ugCard-neon_cyber" onclick="setUgEffectMode('neon_cyber', true)">
-              <div class="m-icon">🌈</div>
-              <div class="m-name">1. Cầu Vồng Dọc Xe</div>
-              <div class="m-desc">Trượt 7 sắc dọc 11 bóng</div>
+          <!-- DROPDOWN CHỌN HIỆU ỨNG ĐÈN GẦM (16 CHẾ ĐỘ) -->
+          <div class="fx-dropdown" id="ugDropdown">
+            <div class="fx-dropdown-trigger" onclick="toggleDropdown('ugDropdown')">
+              <div class="fx-dropdown-active-info">
+                <span class="m-icon" id="ugActiveIcon">🌈</span>
+                <div class="fx-dropdown-active-text">
+                  <div class="title" id="ugActiveName">1. Cầu Vồng Dọc Xe</div>
+                  <div class="desc" id="ugActiveDesc">Trượt 7 sắc dọc 11 bóng</div>
+                </div>
+              </div>
+              <span class="dropdown-arrow"><span id="arrowUgIcon">▼</span> CHỌN HIỆU ỨNG</span>
             </div>
-            <div class="mode-card ug-card" id="ugCard-knight_rider" onclick="setUgEffectMode('knight_rider', true)">
-              <div class="m-icon">🏎️</div>
-              <div class="m-name">2. Mắt Thần K.I.T.T</div>
-              <div class="m-desc">Tia quét Đầu ↔ Đuôi</div>
-            </div>
-            <div class="mode-card ug-card" id="ugCard-meteor_rain" onclick="setUgEffectMode('meteor_rain', true)">
-              <div class="m-icon">☄️</div>
-              <div class="m-name">3. Mưa Sao Băng</div>
-              <div class="m-desc">Sao băng trắng phóng dọc</div>
-            </div>
-            <div class="mode-card ug-card" id="ugCard-dual_flow" onclick="setUgEffectMode('dual_flow', true)">
-              <div class="m-icon">🌊</div>
-              <div class="m-name">4. Sóng Đôi 2 Màu</div>
-              <div class="m-desc">Cuộn sóng Màu Gầm 1 & 2</div>
-            </div>
-            <div class="mode-card ug-card" id="ugCard-center_burst" onclick="setUgEffectMode('center_burst', true)">
-              <div class="m-icon">💥</div>
-              <div class="m-name">5. Bung Tỏa Từ Tâm</div>
-              <div class="m-desc">Giữa gầm nổ sóng ra 2 đầu</div>
-            </div>
-            <div class="mode-card ug-card" id="ugCard-converge_in" onclick="setUgEffectMode('converge_in', true)">
-              <div class="m-icon">🌀</div>
-              <div class="m-name">6. Hội Tụ Về Tâm</div>
-              <div class="m-desc">2 đầu lao vào giữa gầm</div>
-            </div>
-            <div class="mode-card ug-card" id="ugCard-nitro_flame" onclick="setUgEffectMode('nitro_flame', true)">
-              <div class="m-icon">🔥</div>
-              <div class="m-name">7. Lửa Nitro Bô Xe</div>
-              <div class="m-desc">Ngọn lửa bập bùng 11 LED</div>
-            </div>
-            <div class="mode-card ug-card" id="ugCard-police_pursuit" onclick="setUgEffectMode('police_pursuit', true)">
-              <div class="m-icon">🚓</div>
-              <div class="m-name">8. Cảnh Sát Đặc Nhiệm</div>
-              <div class="m-desc">Quét Đỏ-Xanh-Trắng 2 sườn</div>
-            </div>
-            <div class="mode-card ug-card" id="ugCard-throttle_react" onclick="setUgEffectMode('throttle_react', true)">
-              <div class="m-icon">🚀</div>
-              <div class="m-name">9. Cảm Ứng Theo Ga</div>
-              <div class="m-desc">Bóp ga càng lớn chạy càng gắt</div>
-            </div>
-            <div class="mode-card ug-card" id="ugCard-galaxy_twinkle" onclick="setUgEffectMode('galaxy_twinkle', true)">
-              <div class="m-icon">✨</div>
-              <div class="m-name">10. Ngân Hà Lấp Lánh</div>
-              <div class="m-desc">Hạt sao trắng trên nền Neon</div>
-            </div>
-            <div class="mode-card ug-card" id="ugCard-breathing_sync" onclick="setUgEffectMode('breathing_sync', true)">
-              <div class="m-icon">💓</div>
-              <div class="m-name">11. Nhịp Thở Đổi Sắc</div>
-              <div class="m-desc">Thở êm giữa Màu 1 & Màu 2</div>
-            </div>
-            <div class="mode-card ug-card" id="ugCard-theater_chase" onclick="setUgEffectMode('theater_chase', true)">
-              <div class="m-icon">🎪</div>
-              <div class="m-name">12. Đuổi Hạt Cyber</div>
-              <div class="m-desc">Chuỗi hạt 3 bóng rượt đuổi</div>
-            </div>
-            <div class="mode-card ug-card" id="ugCard-strobe_matrix" onclick="setUgEffectMode('strobe_matrix', true)">
-              <div class="m-icon">⚡</div>
-              <div class="m-name">13. Chớp Ma Trận Drift</div>
-              <div class="m-desc">Nháy phân đoạn 4 bóng</div>
-            </div>
-            <div class="mode-card ug-card" id="ugCard-ocean_aurora" onclick="setUgEffectMode('ocean_aurora', true)">
-              <div class="m-icon">🌌</div>
-              <div class="m-name">14. Cực Quang Aurora</div>
-              <div class="m-desc">Sóng lượn đa tầng biến ảo</div>
-            </div>
-            <div class="mode-card ug-card" id="ugCard-turn_sync_ug" onclick="setUgEffectMode('turn_sync_ug', true)">
-              <div class="m-icon">🔗</div>
-              <div class="m-name">15. Gầm Đuổi Xi Nhan</div>
-              <div class="m-desc">Rẽ bên nào gầm bên đó chạy tia</div>
-            </div>
-            <div class="mode-card ug-card" id="ugCard-solid_neon" onclick="setUgEffectMode('solid_neon', true)">
-              <div class="m-icon">💡</div>
-              <div class="m-name">16. Đèn Ống Neon Tĩnh</div>
-              <div class="m-desc">Sáng mịn Gradient Fast&Furious</div>
+            <div class="fx-dropdown-menu">
+              <div class="dropdown-menu-hint">🌌 Bấm vào hiệu ứng bên dưới để gầm xe đổi ngay:</div>
+              <div class="mode-card-grid" id="ugCardsGrid">
+                <div class="mode-card ug-card active" id="ugCard-neon_cyber" onclick="setUgEffectMode('neon_cyber', true)">
+                  <div class="m-icon">🌈</div>
+                  <div class="m-name">1. Cầu Vồng Dọc Xe</div>
+                  <div class="m-desc">Trượt 7 sắc dọc 11 bóng</div>
+                </div>
+                <div class="mode-card ug-card" id="ugCard-knight_rider" onclick="setUgEffectMode('knight_rider', true)">
+                  <div class="m-icon">🏎️</div>
+                  <div class="m-name">2. Mắt Thần K.I.T.T</div>
+                  <div class="m-desc">Tia quét Đầu ↔ Đuôi</div>
+                </div>
+                <div class="mode-card ug-card" id="ugCard-meteor_rain" onclick="setUgEffectMode('meteor_rain', true)">
+                  <div class="m-icon">☄️</div>
+                  <div class="m-name">3. Mưa Sao Băng</div>
+                  <div class="m-desc">Sao băng trắng phóng dọc</div>
+                </div>
+                <div class="mode-card ug-card" id="ugCard-dual_flow" onclick="setUgEffectMode('dual_flow', true)">
+                  <div class="m-icon">🌊</div>
+                  <div class="m-name">4. Sóng Đôi 2 Màu</div>
+                  <div class="m-desc">Cuộn sóng Màu Gầm 1 & 2</div>
+                </div>
+                <div class="mode-card ug-card" id="ugCard-center_burst" onclick="setUgEffectMode('center_burst', true)">
+                  <div class="m-icon">💥</div>
+                  <div class="m-name">5. Bung Tỏa Từ Tâm</div>
+                  <div class="m-desc">Giữa gầm nổ sóng ra 2 đầu</div>
+                </div>
+                <div class="mode-card ug-card" id="ugCard-converge_in" onclick="setUgEffectMode('converge_in', true)">
+                  <div class="m-icon">🌀</div>
+                  <div class="m-name">6. Hội Tụ Về Tâm</div>
+                  <div class="m-desc">2 đầu lao vào giữa gầm</div>
+                </div>
+                <div class="mode-card ug-card" id="ugCard-nitro_flame" onclick="setUgEffectMode('nitro_flame', true)">
+                  <div class="m-icon">🔥</div>
+                  <div class="m-name">7. Lửa Nitro Bô Xe</div>
+                  <div class="m-desc">Ngọn lửa bập bùng 11 LED</div>
+                </div>
+                <div class="mode-card ug-card" id="ugCard-police_pursuit" onclick="setUgEffectMode('police_pursuit', true)">
+                  <div class="m-icon">🚓</div>
+                  <div class="m-name">8. Cảnh Sát Đặc Nhiệm</div>
+                  <div class="m-desc">Quét Đỏ-Xanh-Trắng 2 sườn</div>
+                </div>
+                <div class="mode-card ug-card" id="ugCard-throttle_react" onclick="setUgEffectMode('throttle_react', true)">
+                  <div class="m-icon">🚀</div>
+                  <div class="m-name">9. Cảm Ứng Theo Ga</div>
+                  <div class="m-desc">Bóp ga càng lớn chạy càng gắt</div>
+                </div>
+                <div class="mode-card ug-card" id="ugCard-galaxy_twinkle" onclick="setUgEffectMode('galaxy_twinkle', true)">
+                  <div class="m-icon">✨</div>
+                  <div class="m-name">10. Ngân Hà Lấp Lánh</div>
+                  <div class="m-desc">Hạt sao trắng trên nền Neon</div>
+                </div>
+                <div class="mode-card ug-card" id="ugCard-breathing_sync" onclick="setUgEffectMode('breathing_sync', true)">
+                  <div class="m-icon">💓</div>
+                  <div class="m-name">11. Nhịp Thở Đổi Sắc</div>
+                  <div class="m-desc">Thở êm giữa Màu 1 & Màu 2</div>
+                </div>
+                <div class="mode-card ug-card" id="ugCard-theater_chase" onclick="setUgEffectMode('theater_chase', true)">
+                  <div class="m-icon">🎪</div>
+                  <div class="m-name">12. Đuổi Hạt Cyber</div>
+                  <div class="m-desc">Chuỗi hạt 3 bóng rượt đuổi</div>
+                </div>
+                <div class="mode-card ug-card" id="ugCard-strobe_matrix" onclick="setUgEffectMode('strobe_matrix', true)">
+                  <div class="m-icon">⚡</div>
+                  <div class="m-name">13. Chớp Ma Trận Drift</div>
+                  <div class="m-desc">Nháy phân đoạn 4 bóng</div>
+                </div>
+                <div class="mode-card ug-card" id="ugCard-ocean_aurora" onclick="setUgEffectMode('ocean_aurora', true)">
+                  <div class="m-icon">🌌</div>
+                  <div class="m-name">14. Cực Quang Aurora</div>
+                  <div class="m-desc">Sóng lượn đa tầng biến ảo</div>
+                </div>
+                <div class="mode-card ug-card" id="ugCard-turn_sync_ug" onclick="setUgEffectMode('turn_sync_ug', true)">
+                  <div class="m-icon">🔗</div>
+                  <div class="m-name">15. Gầm Đuổi Xi Nhan</div>
+                  <div class="m-desc">Rẽ bên nào gầm bên đó chạy tia</div>
+                </div>
+                <div class="mode-card ug-card" id="ugCard-solid_neon" onclick="setUgEffectMode('solid_neon', true)">
+                  <div class="m-icon">💡</div>
+                  <div class="m-name">16. Đèn Ống Neon Tĩnh</div>
+                  <div class="m-desc">Sáng mịn Gradient Fast&Furious</div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1182,46 +1326,62 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
             <input type="checkbox" id="chkIntroEnabled" checked onchange="curLedConfig.intro_enabled=this.checked;triggerLivePush()">
           </div>
 
-          <div class="mode-card-grid">
-            <div class="mode-card intro-card active" id="introCard-audi_rs" onclick="setIntroMode('audi_rs')">
-              <div class="m-icon">🏆</div>
-              <div class="m-name">1. Audi RS Matrix</div>
-              <div class="m-desc">Chớp băng 4 góc ➜ Quét gầm & mở rèm</div>
+          <!-- DROPDOWN CHỌN KỊCH BẢN INTRO (8 KỊCH BẢN) -->
+          <div class="fx-dropdown" id="introDropdown">
+            <div class="fx-dropdown-trigger" onclick="toggleDropdown('introDropdown')">
+              <div class="fx-dropdown-active-info">
+                <span class="m-icon" id="introActiveIcon">🏆</span>
+                <div class="fx-dropdown-active-text">
+                  <div class="title" id="introActiveName">1. Audi RS Matrix</div>
+                  <div class="desc" id="introActiveDesc">Chớp băng 4 góc ➜ Quét gầm & mở rèm</div>
+                </div>
+              </div>
+              <span class="dropdown-arrow"><span id="arrowIntroIcon">▼</span> CHỌN KỊCH BẢN</span>
             </div>
-            <div class="mode-card intro-card" id="introCard-cyber_ignite" onclick="setIntroMode('cyber_ignite')">
-              <div class="m-icon">⚡</div>
-              <div class="m-name">2. Cyberpunk Boot</div>
-              <div class="m-desc">Glitch 4 góc ➜ Nạp thanh pin 0..100%</div>
-            </div>
-            <div class="mode-card intro-card" id="introCard-lambo_v12" onclick="setIntroMode('lambo_v12')">
-              <div class="m-icon">🔥</div>
-              <div class="m-name">3. Lambo V12 Ignite</div>
-              <div class="m-desc">Nhịp tim Đỏ ➜ Đề nổ khè lửa pô V12</div>
-            </div>
-            <div class="mode-card intro-card" id="introCard-knight_scanner" onclick="setIntroMode('knight_scanner')">
-              <div class="m-icon">🏎️</div>
-              <div class="m-name">4. K.I.T.T Scanner</div>
-              <div class="m-desc">Quét vòng 4 góc + 2 mắt thần ngược chiều</div>
-            </div>
-            <div class="mode-card intro-card" id="introCard-f1_countdown" onclick="setIntroMode('f1_countdown')">
-              <div class="m-icon">🚦</div>
-              <div class="m-name">5. Đèn Xuất Phát F1</div>
-              <div class="m-desc">Đếm 5 nấc Đỏ ➜ Tắt phụt ➜ Bùng Xanh Lá!</div>
-            </div>
-            <div class="mode-card intro-card" id="introCard-galaxy_supernova" onclick="setIntroMode('galaxy_supernova')">
-              <div class="m-icon">🌌</div>
-              <div class="m-name">6. Vụ Nổ Siêu Tân Tinh</div>
-              <div class="m-desc">Hút về tâm gầm ➜ Nén lõi ➜ Nổ 7 sắc</div>
-            </div>
-            <div class="mode-card intro-card" id="introCard-police_vip" onclick="setIntroMode('police_vip')">
-              <div class="m-icon">🚓</div>
-              <div class="m-name">7. Hộ Tống Đặc Nhiệm</div>
-              <div class="m-desc">Chớp dẫn đoàn Đỏ-Xanh-Trắng đảo chéo</div>
-            </div>
-            <div class="mode-card intro-card" id="introCard-royal_gold" onclick="setIntroMode('royal_gold')">
-              <div class="m-icon">👑</div>
-              <div class="m-name">8. Hoàng Gia Maybach</div>
-              <div class="m-desc">Mở rèm lụa Vàng Hoàng Kim & Ngọc Trai</div>
+            <div class="fx-dropdown-menu">
+              <div class="dropdown-menu-hint">🎬 Bấm vào kịch bản bên dưới để chạy thử ngay:</div>
+              <div class="mode-card-grid">
+                <div class="mode-card intro-card active" id="introCard-audi_rs" onclick="setIntroMode('audi_rs')">
+                  <div class="m-icon">🏆</div>
+                  <div class="m-name">1. Audi RS Matrix</div>
+                  <div class="m-desc">Chớp băng 4 góc ➜ Quét gầm & mở rèm</div>
+                </div>
+                <div class="mode-card intro-card" id="introCard-cyber_ignite" onclick="setIntroMode('cyber_ignite')">
+                  <div class="m-icon">⚡</div>
+                  <div class="m-name">2. Cyberpunk Boot</div>
+                  <div class="m-desc">Glitch 4 góc ➜ Nạp thanh pin 0..100%</div>
+                </div>
+                <div class="mode-card intro-card" id="introCard-lambo_v12" onclick="setIntroMode('lambo_v12')">
+                  <div class="m-icon">🔥</div>
+                  <div class="m-name">3. Lambo V12 Ignite</div>
+                  <div class="m-desc">Nhịp tim Đỏ ➜ Đề nổ khè lửa pô V12</div>
+                </div>
+                <div class="mode-card intro-card" id="introCard-knight_scanner" onclick="setIntroMode('knight_scanner')">
+                  <div class="m-icon">🏎️</div>
+                  <div class="m-name">4. K.I.T.T Scanner</div>
+                  <div class="m-desc">Quét vòng 4 góc + 2 mắt thần ngược chiều</div>
+                </div>
+                <div class="mode-card intro-card" id="introCard-f1_countdown" onclick="setIntroMode('f1_countdown')">
+                  <div class="m-icon">🚦</div>
+                  <div class="m-name">5. Đèn Xuất Phát F1</div>
+                  <div class="m-desc">Đếm 5 nấc Đỏ ➜ Tắt phụt ➜ Bùng Xanh Lá!</div>
+                </div>
+                <div class="mode-card intro-card" id="introCard-galaxy_supernova" onclick="setIntroMode('galaxy_supernova')">
+                  <div class="m-icon">🌌</div>
+                  <div class="m-name">6. Vụ Nổ Siêu Tân Tinh</div>
+                  <div class="m-desc">Hút về tâm gầm ➜ Nén lõi ➜ Nổ 7 sắc</div>
+                </div>
+                <div class="mode-card intro-card" id="introCard-police_vip" onclick="setIntroMode('police_vip')">
+                  <div class="m-icon">🚓</div>
+                  <div class="m-name">7. Hộ Tống Đặc Nhiệm</div>
+                  <div class="m-desc">Chớp dẫn đoàn Đỏ-Xanh-Trắng đảo chéo</div>
+                </div>
+                <div class="mode-card intro-card" id="introCard-royal_gold" onclick="setIntroMode('royal_gold')">
+                  <div class="m-icon">👑</div>
+                  <div class="m-name">8. Hoàng Gia Maybach</div>
+                  <div class="m-desc">Mở rèm lụa Vàng Hoàng Kim & Ngọc Trai</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1522,12 +1682,19 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     document.getElementById('activeHexDisplay').innerText = hex;
     document.getElementById('nativeColorInput').value = hex;
 
+    const curQuick = document.getElementById('quickPicker-' + activeColorTarget);
+    if (curQuick) curQuick.value = hex;
+    const curTxt = document.getElementById('txtHex-' + activeColorTarget);
+    if (curTxt) curTxt.innerText = hex;
+
     if (activeColorTarget === 'left') {
       curLedConfig.left_color = hex;
       document.getElementById('dotTarget-left').style.background = hex;
       if (curLedConfig.sync_sides) {
         curLedConfig.right_color = hex;
         document.getElementById('dotTarget-right').style.background = hex;
+        const qR = document.getElementById('quickPicker-right'); if (qR) qR.value = hex;
+        const tR = document.getElementById('txtHex-right'); if (tR) tR.innerText = hex;
       }
     } else if (activeColorTarget === 'right') {
       curLedConfig.right_color = hex;
@@ -1535,13 +1702,19 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
       if (curLedConfig.sync_sides) {
         curLedConfig.left_color = hex;
         document.getElementById('dotTarget-left').style.background = hex;
+        const qL = document.getElementById('quickPicker-left'); if (qL) qL.value = hex;
+        const tL = document.getElementById('txtHex-left'); if (tL) tL.innerText = hex;
       }
     } else if (activeColorTarget === 'drl') {
       curLedConfig.drl_color = hex;
       document.getElementById('dotTarget-drl').style.background = hex;
     } else if (activeColorTarget === 'ug1') {
       curLedConfig.ug_color1 = hex;
-      if (ugColorSlotMode === 'both') curLedConfig.ug_color2 = hex;
+      if (ugColorSlotMode === 'both') {
+        curLedConfig.ug_color2 = hex;
+        const qU2 = document.getElementById('quickPicker-ug2'); if (qU2) qU2.value = hex;
+        const tU2 = document.getElementById('txtHex-ug2'); if (tU2) tU2.innerText = hex;
+      }
       ensureUgColorVisibleMode();
       syncUgColorUI();
     } else if (activeColorTarget === 'ug2') {
@@ -1603,6 +1776,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
   function triggerLivePush(previewAct = null, immediate = false, saveToNvs = false) {
     if (previewAct) pendingPreviewAct = previewAct;
     if (livePushTimeout) clearTimeout(livePushTimeout);
+    setSyncStatus('syncing', 'Đang gửi lên Cloud Render...', 'Chuẩn bị đồng bộ xuống xe');
     livePushTimeout = setTimeout(() => {
       const payload = Object.assign({}, curLedConfig, { live: !saveToNvs });
       if (pendingPreviewAct) {
@@ -1618,7 +1792,11 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(payload)
-      }).catch(()=>{});
+      }).then(r => r.json()).then(res => {
+        setSyncStatus('saved_cloud', 'Đã lưu lên Cloud Render', 'Xe sẽ kéo cấu hình mới ở nhịp polling kế (1-3s)');
+      }).catch(()=>{
+        setSyncStatus('syncing', 'Lỗi kết nối Cloud', 'Đang tự thử lại...');
+      });
     }, immediate ? 15 : 110);
   }
 
@@ -1674,13 +1852,144 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     }
   }
 
+  // =========================================================================
+  // DROPDOWN VÀ BẢNG MÀU SỔ XUỐNG CÓ DẤU MŨI TÊN ▼
+  // =========================================================================
+  function toggleDropdown(id, forceState = null) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const isOpen = el.classList.contains('open');
+    const next = (forceState !== null) ? forceState : !isOpen;
+    if (next) {
+      document.querySelectorAll('.fx-dropdown').forEach(d => { if (d !== el) d.classList.remove('open'); });
+      el.classList.add('open');
+    } else {
+      el.classList.remove('open');
+    }
+  }
+
+  function toggleColorStudioDetail(forceState = null) {
+    const drawer = document.getElementById('colorStudioDetailDrawer');
+    const arrow = document.getElementById('arrowColorStudio');
+    const btnTxt = document.getElementById('btnTxtColorStudio');
+    if (!drawer) return;
+    const isHidden = (drawer.style.display === 'none' || getComputedStyle(drawer).display === 'none');
+    const willShow = (forceState !== null) ? forceState : isHidden;
+    drawer.style.display = willShow ? 'grid' : 'none';
+    if (arrow) arrow.innerText = willShow ? '▲' : '▼';
+    if (btnTxt) btnTxt.innerText = willShow ? 'THU GỌN VÒNG MÀU' : 'MỞ VÒNG MÀU 360°';
+    if (willShow) initColorCanvases();
+  }
+
+  function setSyncStatus(state, msg, sub = '') {
+    const dot = document.getElementById('csDot');
+    const text = document.getElementById('csText');
+    const subEl = document.getElementById('csSub');
+    if (!dot || !text) return;
+    if (state === 'syncing') {
+      dot.className = 'cs-dot syncing';
+      text.innerText = '⏳ ' + msg;
+      text.style.color = '#ff9900';
+      if (subEl) subEl.innerText = sub || 'Đang gửi lên Cloud Render ➜ Xe chuẩn bị nhận lệnh...';
+    } else if (state === 'saved_cloud') {
+      dot.className = 'cs-dot syncing';
+      text.innerText = '☁️ ' + msg;
+      text.style.color = '#58a6ff';
+      if (subEl) subEl.innerText = sub || 'Đã lưu lên Cloud ➜ Xe sẽ áp dụng ở nhịp polling kế (1-3s)...';
+    } else if (state === 'synced') {
+      dot.className = 'cs-dot synced';
+      text.innerText = '✅ ' + msg;
+      text.style.color = '#3fb950';
+      if (subEl) subEl.innerText = sub || 'Xe đã nhận và áp dụng hiệu ứng thành công!';
+    } else {
+      dot.className = 'cs-dot';
+      text.innerText = '☁️ ' + msg;
+      text.style.color = '#00e5ff';
+      if (subEl) subEl.innerText = sub;
+    }
+  }
+
+  function updateTurnDropdownTrigger(mode) {
+    const meta = {
+      'audi':         { icon: '🌊', name: '1. Audi Matrix', desc: 'Quét đuổi bóng 1 ➜ 2' },
+      'standard':     { icon: '⚡', name: '2. Chớp Chuẩn Đua', desc: 'Nháy đồng bộ 2 bóng' },
+      'strobe_f1':    { icon: '🚨', name: '3. F1 Triple Strobe', desc: 'Chớp 3 nhịp siêu tốc F1' },
+      'pingpong':     { icon: '🏓', name: '4. Đảo Pha Trong-Ngoài', desc: 'Bóng 1 & 2 nháy luân phiên' },
+      'front_rear':   { icon: '🔄', name: '5. Đuổi Trước ➜ Đuôi', desc: 'Cụm Trước truyền xuống Đuôi' },
+      'pulse':        { icon: '💓', name: '6. Nhịp Thở Êm', desc: 'Sáng mờ dần theo hàm Sin' },
+      'heartbeat':    { icon: '❤️', name: '7. Nhịp Tim Kép', desc: 'Đập 2 nhịp Thịch-Thịch' },
+      'sparkle':      { icon: '✨', name: '8. Kim Cương Flash', desc: 'Chớp hạt trắng Diamond' },
+      'police_turn':  { icon: '🚓', name: '9. Cảnh Sát Đuổi Pha', desc: 'Chớp Đỏ-Xanh Trước/Sau' },
+      'laser_shot':   { icon: '☄️', name: '10. Phóng Tia Laser', desc: 'Bắn tia nhanh có đuôi mờ' },
+      'rainbow_turn': { icon: '🌈', name: '11. Cầu Vồng Rẽ', desc: 'Xoay 7 sắc trên cụm rẽ' },
+      'plasma_dual':  { icon: '🔥', name: '12. Phối 2 Màu Morph', desc: 'Trộn màu Xi Nhan & Demi' }
+    };
+    const info = meta[mode] || { icon: '🔶', name: mode, desc: 'Hiệu ứng Xi Nhan' };
+    const iconEl = document.getElementById('turnActiveIcon');
+    const nameEl = document.getElementById('turnActiveName');
+    const descEl = document.getElementById('turnActiveDesc');
+    if (iconEl) iconEl.innerText = info.icon;
+    if (nameEl) nameEl.innerText = info.name;
+    if (descEl) descEl.innerText = info.desc;
+  }
+
+  function updateUgDropdownTrigger(ugMode) {
+    const meta = {
+      'neon_cyber':     { icon: '🌈', name: '1. Cầu Vồng Dọc Xe', desc: 'Trượt 7 sắc dọc 11 bóng' },
+      'knight_rider':   { icon: '🏎️', name: '2. Mắt Thần K.I.T.T', desc: 'Tia quét Đầu ↔ Đuôi' },
+      'meteor_rain':    { icon: '☄️', name: '3. Mưa Sao Băng', desc: 'Sao băng trắng phóng dọc' },
+      'dual_flow':      { icon: '🌊', name: '4. Sóng Đôi 2 Màu', desc: 'Cuộn sóng Màu Gầm 1 & 2' },
+      'center_burst':   { icon: '💥', name: '5. Bung Tỏa Từ Tâm', desc: 'Giữa gầm nổ sóng ra 2 đầu' },
+      'converge_in':    { icon: '🌀', name: '6. Hội Tụ Về Tâm', desc: '2 đầu lao vào giữa gầm' },
+      'nitro_flame':    { icon: '🔥', name: '7. Lửa Nitro Bô Xe', desc: 'Ngọn lửa bập bùng 11 LED' },
+      'police_pursuit': { icon: '🚓', name: '8. Cảnh Sát Đặc Nhiệm', desc: 'Quét Đỏ-Xanh-Trắng 2 sườn' },
+      'throttle_react': { icon: '🚀', name: '9. Cảm Ứng Theo Ga', desc: 'Bóp ga càng lớn chạy càng gắt' },
+      'galaxy_twinkle': { icon: '✨', name: '10. Ngân Hà Lấp Lánh', desc: 'Hạt sao trắng trên nền Neon' },
+      'breathing_sync': { icon: '💓', name: '11. Nhịp Thở Đổi Sắc', desc: 'Thở êm giữa Màu 1 & Màu 2' },
+      'theater_chase':  { icon: '🎪', name: '12. Đuổi Hạt Cyber', desc: 'Chuỗi hạt 3 bóng rượt đuổi' },
+      'strobe_matrix':  { icon: '⚡', name: '13. Chớp Ma Trận Drift', desc: 'Nháy phân đoạn 4 bóng' },
+      'ocean_aurora':   { icon: '🌌', name: '14. Cực Quang Aurora', desc: 'Sóng lượn đa tầng biến ảo' },
+      'turn_sync_ug':   { icon: '🔗', name: '15. Gầm Đuổi Xi Nhan', desc: 'Rẽ bên nào gầm bên đó chạy tia' },
+      'solid_neon':     { icon: '💡', name: '16. Đèn Ống Neon Tĩnh', desc: 'Sáng mịn Gradient Fast&Furious' }
+    };
+    const info = meta[ugMode] || { icon: '🌌', name: ugMode, desc: 'Hiệu ứng Đèn Gầm' };
+    const iconEl = document.getElementById('ugActiveIcon');
+    const nameEl = document.getElementById('ugActiveName');
+    const descEl = document.getElementById('ugActiveDesc');
+    if (iconEl) iconEl.innerText = info.icon;
+    if (nameEl) nameEl.innerText = info.name;
+    if (descEl) descEl.innerText = info.desc;
+  }
+
+  function updateIntroDropdownTrigger(inMode) {
+    const meta = {
+      'audi_rs':          { icon: '🏆', name: '1. Audi RS Matrix', desc: 'Chớp băng 4 góc ➜ Quét gầm & mở rèm' },
+      'cyber_ignite':     { icon: '⚡', name: '2. Cyberpunk Boot', desc: 'Glitch 4 góc ➜ Nạp thanh pin 0..100%' },
+      'lambo_v12':        { icon: '🔥', name: '3. Lambo V12 Ignite', desc: 'Nhịp tim Đỏ ➜ Đề nổ khè lửa pô V12' },
+      'knight_scanner':   { icon: '🏎️', name: '4. K.I.T.T Scanner', desc: 'Quét vòng 4 góc + 2 mắt thần ngược chiều' },
+      'f1_countdown':     { icon: '🚦', name: '5. Đèn Xuất Phát F1', desc: 'Đếm 5 nấc Đỏ ➜ Tắt phụt ➜ Bùng Xanh Lá!' },
+      'galaxy_supernova': { icon: '🌌', name: '6. Vụ Nổ Siêu Tân Tinh', desc: 'Hút về tâm gầm ➜ Nén lõi ➜ Nổ 7 sắc' },
+      'police_vip':       { icon: '🚓', name: '7. Hộ Tống Đặc Nhiệm', desc: 'Chớp dẫn đoàn Đỏ-Xanh-Trắng đảo chéo' },
+      'royal_gold':       { icon: '👑', name: '8. Hoàng Gia Maybach', desc: 'Mở rèm lụa Vàng Hoàng Kim & Ngọc Trai' }
+    };
+    const info = meta[inMode] || { icon: '🎬', name: inMode, desc: 'Kịch bản Intro' };
+    const iconEl = document.getElementById('introActiveIcon');
+    const nameEl = document.getElementById('introActiveName');
+    const descEl = document.getElementById('introActiveDesc');
+    if (iconEl) iconEl.innerText = info.icon;
+    if (nameEl) nameEl.innerText = info.name;
+    if (descEl) descEl.innerText = info.desc;
+  }
+
   function setEffectMode(mode, userClicked = false) {
     curLedConfig.mode = mode;
     document.querySelectorAll('.mode-card:not(.ug-card):not(.intro-card)').forEach(c => c.classList.remove('active'));
     const target = document.getElementById('modeCard-' + mode);
     if (target) target.classList.add('active');
+    updateTurnDropdownTrigger(mode);
 
     if (userClicked) {
+      toggleDropdown('turnDropdown', false);
       simIntroPlaying = false;
       if (!curLedConfig.turn_always_fx && (simActiveState === 'drl' || simActiveState === 'off_all')) {
         simActiveState = 'hazard';
@@ -1854,8 +2163,10 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     document.querySelectorAll('.mode-card.ug-card').forEach(c => c.classList.remove('active'));
     const target = document.getElementById('ugCard-' + ugMode);
     if (target) target.classList.add('active');
+    updateUgDropdownTrigger(ugMode);
     syncUgColorUI();
     if (userClicked) {
+      toggleDropdown('ugDropdown', false);
       refreshUnderglowCompetitionUI();
       showSimDrlPreview();
       triggerLivePush('drl', true, true);
@@ -1872,6 +2183,8 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
     document.querySelectorAll('.mode-card.intro-card').forEach(c => c.classList.remove('active'));
     const target = document.getElementById('introCard-' + inMode);
     if (target) target.classList.add('active');
+    updateIntroDropdownTrigger(inMode);
+    toggleDropdown('introDropdown', false);
     triggerLivePush(null, false, true);
     playStartupIntroNow();
   }
@@ -2144,6 +2457,17 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         const isFactoryRainbow = ((curLedConfig.ug_mode || 'neon_cyber') === 'neon_cyber' && c1u === '#00E5FF' && c2u === '#9D00FF');
         ugColorSlotMode = (c1u === c2u || isFactoryRainbow) ? 'both' : '1';
 
+        ['left', 'right', 'drl', 'ug1', 'ug2'].forEach(t => {
+          let h = '#FFAA00';
+          if (t === 'left') h = curLedConfig.left_color || '#FFAA00';
+          else if (t === 'right') h = curLedConfig.right_color || '#FFAA00';
+          else if (t === 'drl') h = curLedConfig.drl_color || '#00E5FF';
+          else if (t === 'ug1') h = curLedConfig.ug_color1 || '#00E5FF';
+          else if (t === 'ug2') h = curLedConfig.ug_color2 || '#9D00FF';
+          const q = document.getElementById('quickPicker-' + t); if (q) q.value = h;
+          const th = document.getElementById('txtHex-' + t); if (th) th.innerText = h;
+        });
+
         selectColorTarget('left');
         setEffectMode(curLedConfig.mode || 'audi');
         setUgEffectMode(curLedConfig.ug_mode || 'neon_cyber');
@@ -2151,6 +2475,7 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
         document.querySelectorAll('.mode-card.intro-card').forEach(c => c.classList.remove('active'));
         const introTarget = document.getElementById('introCard-' + (curLedConfig.intro_mode || 'audi_rs'));
         if (introTarget) introTarget.classList.add('active');
+        updateIntroDropdownTrigger(curLedConfig.intro_mode || 'audi_rs');
         updateMasterLightUI(!!curLedConfig.master_lights);
         refreshUnderglowCompetitionUI();
         startLedSimulator();
@@ -2996,10 +3321,13 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
       const conn = document.getElementById('connPill');
       if (d.online) {
         conn.className = 'pill online';
-        conn.innerText = '● XE ONLINE (NguyenNgocTai)';
+        conn.innerText = '● XE ONLINE (Cloud Sync)';
+        if (d.is_synced) {
+          setSyncStatus('synced', 'XE ĐÃ ĐỒNG BỘ 100%', 'Hiệu ứng & màu mới nhất đã được nạp trên xe!');
+        }
       } else {
         conn.className = 'pill offline';
-        conn.innerText = '● XE OFFLINE (Chưa thấy UDP)';
+        conn.innerText = '● XE OFFLINE (Chờ sync)';
       }
 
       document.getElementById('ipPill').innerText = 'IP XE: ' + (d.ip || '---');
@@ -3166,11 +3494,15 @@ def xedua_led_page():
 def api_state():
     if time.time() - car_state["last_seen"] > 4.5:
         car_state["online"] = False
-    return jsonify(car_state)
+    car_ver = int(car_state.get("cfg_ver", 0) or 0)
+    res = dict(car_state)
+    res["target_cfg_ver"] = cfg_version
+    res["is_synced"] = (car_ver >= cfg_version)
+    return jsonify(res)
 
 @xedua_bp.route("/api/xedua/led", methods=["GET", "POST"])
 def api_led():
-    global led_config, web_cfg_dirty, cfg_version
+    global led_config, web_cfg_dirty, cfg_version, pending_commands
     if request.method == "POST":
         data = request.get_json(force=True, silent=True) or {}
         if "config" in data and isinstance(data["config"], dict):
@@ -3182,9 +3514,11 @@ def api_led():
         p_act = data.pop("preview_act", None) or data.pop("action", None)
         if p_act:
             pending_commands["test_action"] = p_act
+            pending_commands["test_time"] = time.time()
         in_mode = data.get("intro_mode")
         if in_mode:
             pending_commands["test_in_mode"] = in_mode
+            pending_commands["test_time"] = time.time()
 
         led_config.update(data)
         save_led_config(led_config)
@@ -3192,8 +3526,8 @@ def api_led():
         if cfg_version <= last_car_ver:
             cfg_version = last_car_ver + 1
         web_cfg_dirty = True
-        return jsonify({"status": "ok", "message": "Đã lưu lên Render Cloud (Xe sẽ tự đồng bộ)", "config": led_config})
-    return jsonify({"status": "ok", "config": led_config})
+        return jsonify({"status": "ok", "message": "Đã lưu lên Render Cloud (Xe sẽ tự đồng bộ)", "config": led_config, "cfg_ver": cfg_version})
+    return jsonify({"status": "ok", "config": led_config, "cfg_ver": cfg_version})
 
 @xedua_bp.route("/api/xedua/led/test", methods=["POST"])
 def api_led_test():
@@ -3202,18 +3536,19 @@ def api_led_test():
     in_mode = data.get("intro_mode", led_config.get("intro_mode", "audi_rs"))
     pending_commands["test_action"] = act
     pending_commands["test_in_mode"] = in_mode
-    return jsonify({"status": "ok", "message": f"?? g?i l?nh test {act} l?n Cloud!"})
+    pending_commands["test_time"] = time.time()
+    return jsonify({"status": "ok", "message": f"Đã gửi lệnh test {act} lên Cloud!"})
 
 @xedua_bp.route("/api/xedua/tune", methods=["POST"])
 def api_tune():
     qs = request.query_string.decode("utf-8")
     pending_commands["tune_qs"] = qs
-    return jsonify({"status": "ok", "message": "?? c?p nh?t th?ng s? l?n Render Cloud!"})
+    return jsonify({"status": "ok", "message": "Đã cập nhật thông số lên Render Cloud!"})
 
 @xedua_bp.route("/api/xedua/zero_imu", methods=["POST"])
 def api_zero_imu():
     pending_commands["zero_imu"] = True
-    return jsonify({"status": "ok", "message": "?? y?u c?u ??t l?i g?c 0? IMU!"})
+    return jsonify({"status": "ok", "message": "Đã yêu cầu đặt lại góc 0° IMU!"})
 
 @xedua_bp.route("/api/xedua/ota_flash", methods=["POST"])
 def api_ota_flash():
@@ -3234,9 +3569,6 @@ def api_car_sync():
 
     car_cfg_ver = int(data.get("cfg_ver", 0) or 0)
     # BẢO VỆ CẤU HÌNH XE KHI RENDER KHỞI ĐỘNG LẠI:
-    # Nếu Render vừa khởi động lại (web_cfg_dirty=False, cfg_version <= 1) mà xe đã có cấu hình trong NVS,
-    # Render giữ nguyên phiên bản của xe. Ngược lại nếu Web vừa có chỉnh sửa mới (web_cfg_dirty=True),
-    # luôn ép đồng bộ xuống xe kể cả khi xe đang có cfg_ver cao hơn!
     if not web_cfg_dirty and cfg_version <= 1 and car_cfg_ver > 1:
         cfg_version = car_cfg_ver
     elif web_cfg_dirty and car_cfg_ver >= cfg_version:
@@ -3246,19 +3578,26 @@ def api_car_sync():
     if not need_cfg and car_cfg_ver == cfg_version:
         web_cfg_dirty = False
 
+    t_act = pending_commands.get("test_action")
+    t_in_m = pending_commands.get("test_in_mode")
+    t_time = pending_commands.get("test_time", 0)
+
     resp = {
         "status": "ok",
         "cfg_ver": cfg_version,
         "config": led_config if need_cfg else None,
-        "test_action": pending_commands.get("test_action"),
-        "test_in_mode": pending_commands.get("test_in_mode"),
+        "test_action": t_act,
+        "test_in_mode": t_in_m,
         "zero_imu": pending_commands.get("zero_imu"),
         "tune_qs": pending_commands.get("tune_qs"),
         "ota_url": pending_commands.get("ota_url")
     }
 
-    pending_commands["test_action"] = None
-    pending_commands["test_in_mode"] = None
+    # CHỐNG MẤT LỆNH: Giữ test_action trong vòng 7 giây hoặc cho đến khi xe xác nhận đã nhận phiên bản mới!
+    if time.time() - t_time > 7.0 or (t_act is not None and not need_cfg and car_cfg_ver >= cfg_version):
+        pending_commands["test_action"] = None
+        pending_commands["test_in_mode"] = None
+
     pending_commands["zero_imu"] = False
     pending_commands["tune_qs"] = None
     pending_commands["ota_url"] = None
